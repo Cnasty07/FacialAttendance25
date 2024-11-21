@@ -13,7 +13,7 @@ class DBSchema:
         """
         self.connection_obj = sqlite3.connect('./data/db/records.db')
         self.cursor_obj = self.connection_obj.cursor()
-        self.cursor_obj.execute("PRAGMA foreign_keys = ON")
+        self.cursor_obj.execute("PRAGMA foreign_keys = ON;")
         
         
     def create_db(self):
@@ -36,20 +36,22 @@ class DBSchema:
             CREATE TABLE IF NOT EXISTS Student (
             STUDENT_ID INTEGER PRIMARY KEY AUTOINCREMENT,
             CLASS_ID INTEGER,
-            FOREIGN KEY 
-                REFERENCES Class(CLASS_ID),
-            STUDENT_NAME TEXT NOT NULL
+            STUDENT_NAME TEXT,
+            FOREIGN KEY (CLASS_ID)
+                REFERENCES Class(CLASS_ID)
+            
             ); """
+            
         Attendance_table = """CREATE TABLE IF NOT EXISTS Attendance (
             ATTENDANCE_ID INTEGER PRIMARY KEY AUTOINCREMENT,
             STUDENT_ID INTEGER,
-            FOREIGN KEY (STUDENT_ID) REFERENCES Student(STUDENT_ID),
             CLASS_ID INTEGER,
-            FOREIGN KEY (CLASS_ID) REFERENCES Class(CLASS_ID),
             ATTENDANCE_DATE TEXT NOT NULL,
-            ATTENDANCE_STATUS TEXT NOT NULL
+            ATTENDANCE_STATUS TEXT NOT NULL,
+            FOREIGN KEY (CLASS_ID) REFERENCES Class(CLASS_ID),
+            FOREIGN KEY (STUDENT_ID) REFERENCES Student(STUDENT_ID)
             ); """
-        print(Student_table)
+            
         self.cursor_obj.execute(Class_table)
         self.cursor_obj.execute(Student_table)
         self.cursor_obj.execute(Attendance_table)
