@@ -66,7 +66,8 @@ class DBSchema:
         """
         self.connection_obj.close()
     
-    
+
+
 
 def main():
     new_init_db = DBSchema()

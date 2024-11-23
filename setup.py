@@ -9,6 +9,8 @@ setup(
         'opencv-python',
         'dlib',
         'face_recognition',
+        'pandas', 
+        'scikit-learn',  
     ],
     entry_points={
         'console_scripts': [
