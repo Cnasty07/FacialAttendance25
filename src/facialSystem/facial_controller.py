@@ -3,9 +3,9 @@ import face_recognition
 import dlib
 
 # import the other scripts to start the process
-from capture import Capture
-from . import comparison
-from . import recognition
+from .components.capture import Capture
+from .components.comparison import FacialComparison
+from .components.recognition import FacialRecognition
 
 # TODO: Need to fix some boilerplate code
 
@@ -24,7 +24,7 @@ class FacialController:
             print("Error: ", e)
             print("Could not capture image. Please try again.")
         # step 2: compare face to known faces returns {student_id , }
-        new_comparison_data = comparison.FacialComparison().compare_faces(capture)
+        new_comparison_data = FacialComparison().compare_faces(capture)
         # step 3: return result
         print("Match found: ", new_comparison_data.student_id)
         # step 4: if match, return name and check in
