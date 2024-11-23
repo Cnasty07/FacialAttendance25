@@ -1,3 +1,3 @@
-from . import db_controller , db_schema
+from . import *
 
-__all__ = ['db_controller', 'db_schema']
+__all__ = ['recordsController']
