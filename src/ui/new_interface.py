@@ -11,26 +11,33 @@ class FacialAttendanceSystemApp:
         self.root = root
         self.root.title("Facial Attendance System")
         self.root.geometry("800x600")
+        self.root.configure(background="grey")
 
         # Title
         self.title_label = Label(root, text="Facial Attendance System", font=("Helvetica", 20, "bold"))
         self.title_label.pack(pady=10)
 
         # Camera Feed Frame
-        self.camera_frame = Label(root)
-        self.camera_frame.pack(pady=10, expand=True, fill="both")
+        self.camera_frame = Label(root, width=200, height=400)
+        self.camera_frame.pack(pady=10, expand=False, fill="both")
+        
+        # Input field
+        self.input_label = Label(root, text="Enter Student Name:", font=("Helvetica", 14))
+        self.input_label.pack(pady=5)
+        self.input_entry = tk.Entry(root, font=("Helvetica", 14))
+        self.input_entry.pack(pady=5)
 
         # Record Attendance Button
         self.record_button = Button(
             root,
             text="Record Attendance",
             font=("Helvetica", 14),
-            command=self.record_attendance  # Placeholder for the method to be hooked up later
+            command=self.record_attendance
         )
         self.record_button.pack(pady=10)
 
         # Initialize camera and thread
-        self.cap = cv2.VideoCapture(0)  # Open the default camera (index 0)
+        self.cap = cv2.VideoCapture(0)  # Open the default camera
         self.running = True
         self.update_camera()
 
@@ -81,9 +88,12 @@ class FacialAttendanceSystemApp:
 
     def record_attendance(self):
         """Method to simulate attendance recording and open the confirmation window."""
-        # Simulate getting student name and class name (replace this with real data later)
+        # Simulate getting student name and class name (replace this with real data)
         student_name = "John Doe"
-        class_name = "Math 101"
+        class_name = "CSCI 3366"
+
+        if self.input_entry.get() != "":
+            student_name = self.input_entry.get()
 
         # Open the confirmation window
         threading.Thread(target=self.confirm_attendance, args=(student_name, class_name)).start()
