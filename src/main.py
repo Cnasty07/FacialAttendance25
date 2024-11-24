@@ -2,6 +2,7 @@ import os
 import cv2
 import dlib
 from .facialSystem import facial_controller
+from .ui import new_interface
 
 #main code 
 def activate():
@@ -12,8 +13,18 @@ def activate():
     os.add_dll_directory(os.environ['CUDA_PATH'])
     dlib.DLIB_USE_CUDA = True
     
-    # start the capture of face from the camera or stored image
-    facial_controller.start_new_entry()
+    facial_controller.FacialController
+
+    # loop to check everyone in until done.
+    while True:
+        
+        # starts the interface
+        check_in = new_interface.FacialAttendanceSystemApp()
+        
+        
+
+
+
     
     
 

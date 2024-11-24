@@ -10,7 +10,8 @@ setup(
         'dlib',
         'face_recognition',
         'pandas', 
-        'scikit-learn',  
+        'scikit-learn',
+        'Pillow',
     ],
     entry_points={
         'console_scripts': [
