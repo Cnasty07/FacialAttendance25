@@ -3,9 +3,25 @@ import cv2
 import face_recognition
 from datetime import datetime
 
+### INFO: A class to capture the image or video that is callable.
 class Capture:
-    """ Summary:
-    A class to capture video and images using OpenCV.
+    """
+    Summary:
+        The Capture class provides functionality to capture video and images using OpenCV. 
+        It supports three capture methods: 'video', 'image', and 'stored'. The 'video' method 
+        captures video frames continuously until the user stops it, the 'image' method captures 
+        a single image, and the 'stored' method is used for testing purposes to return a stored image.
+    Methods:
+        __init__(capture_method: str):
+            Initializes the Capture object and starts the appropriate capture method based on the input parameter.
+        start_video_capture():
+            Captures video frames from the default camera, displays them in a window, and saves the last frame 
+            as an image file with a timestamp. The video capture stops when the user presses the 'q' key.
+        start_image_capture():
+            Captures a single image from the default camera, displays it in a window, and saves it as an image 
+            file with a timestamp.
+        start_return_image():
+            Returns a stored image for testing purposes.
     """
     
     def __init__(self,capture_method: str):
@@ -40,7 +56,7 @@ class Capture:
         # Format the date and time to include in the file path
         timestamp = now.strftime("%Y%m%d_%H%M%S")
         # Save the captured image to the specified path with the timestamp
-        file_path = f'./data/db/captures/captured_image_{timestamp}.jpg'
+        file_path = f'./database/captures/captured_image_{timestamp}.jpg'
         # Save the captured image to the specified path
         cv2.imwrite(file_path, frame)
         
@@ -70,7 +86,7 @@ class Capture:
         # Format the date and time to include in the file path
         timestamp = now.strftime("%Y%m%d_%H%M%S")
         # Save the captured image to the specified path with the timestamp
-        file_path = f'./data/db/captures/captured_image_{timestamp}.jpg'
+        file_path = f'./database/captures/captured_image_{timestamp}.jpg'
         # Save the captured image to the specified path
         cv2.imwrite(file_path, frame)
         
@@ -81,15 +97,13 @@ class Capture:
         
         return face_recognition.load_image_file(file_path)
 
-def start_return_image(self):
-    return face_recognition.load_image_file('../../data/db/tests/Musk3.jpg')
+    def start_return_image(self):
+        return face_recognition.load_image_file('../../database/tests/Musk3.jpg')
 
 def main():
-    capture = Capture('video')
-    # method one to capture video
-    capture.start_video_capture()
-    # method two to capture image
-    capture.start_image_capture()
+    capture = Capture('stored')
+    print(capture)
+    
 
 if __name__ == '__main__':
     main() 

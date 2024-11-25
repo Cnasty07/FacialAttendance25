@@ -1,10 +1,9 @@
 import datetime
 import tkinter as tk
-from tkinter import Label, Button
+from tkinter import Label, Button , ttk 
 import cv2
 from PIL import Image, ImageTk
 import threading
-
 
 class FacialAttendanceSystemApp:
     def __init__(self, root):
@@ -15,6 +14,18 @@ class FacialAttendanceSystemApp:
         # Title
         self.title_label = Label(root, text="Facial Attendance System", font=("Helvetica", 20, "bold"))
         self.title_label.pack(pady=10)
+        
+        # FIXME: Implement the class list from the database
+        # Class List
+        # classes_list = ClassTable("./database/school.db").read_all()
+        # print(classes_list)
+
+        def on_select(event):
+            selected_item = self.class_list.get()
+        self.class_list = ttk.Combobox(root,values= ["Math 101","Math 102","Math 103","Math 104","Math 105"])
+        self.class_list.set("Select Class")
+        self.class_list.bind("<<ComboboxSelected>>",on_select)
+        self.class_list.pack(pady=10)
 
         # Camera Feed Frame
         self.camera_frame = Label(root)

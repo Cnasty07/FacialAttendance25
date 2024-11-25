@@ -1,8 +1,9 @@
 import sqlite3
 import json
+from abc import ABC, abstractmethod
 
 
-class DatabaseController:
+class DatabaseController(ABC):
     def __init__(self, db_name):
         self.db_name = db_name
         self.conn = None
@@ -25,6 +26,27 @@ class DatabaseController:
             self.conn.commit()
         except sqlite3.Error as e:
             print(f"Database query failed: {e}")
+    
+    @abstractmethod
+    def create(self, *args, **kwargs):
+        pass
+
+    @abstractmethod
+    def read(self, *args, **kwargs):
+        pass
+
+    @abstractmethod
+    def read_all(self, *args, **kwargs):
+        pass
+
+    @abstractmethod
+    def update(self, *args, **kwargs):
+        pass
+
+    @abstractmethod
+    def delete(self, *args, **kwargs):
+        pass
+
 
 
 class ClassTable(DatabaseController):
@@ -229,15 +251,15 @@ def main():
     # Example usage
     class_table = ClassTable(db_name)
     class_table.create("Math 101", 101, "Introductory Math", "2024-01-15", "2024-05-15", "09:00:00")
+    print(class_table.read_all())
+    # student_table = StudentTable(db_name)
+    # student_table.create("Alice Johnson", 1, ["encoding_data"])
 
-    student_table = StudentTable(db_name)
-    student_table.create("Alice Johnson", 1, ["encoding_data"])
+    # attendance_table = AttendanceTable(db_name)
+    # attendance_table.create(1, 1, "2024-01-16", "Present")
 
-    attendance_table = AttendanceTable(db_name)
-    attendance_table.create(1, 1, "2024-01-16", "Present")
-
-    face_table = FaceTable(db_name)
-    face_table.create(1, ["face_encoding_data"])
+    # face_table = FaceTable(db_name)
+    # face_table.create(1, ["face_encoding_data"])
 
     print("Setup complete.")
 

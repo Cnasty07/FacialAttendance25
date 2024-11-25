@@ -12,7 +12,7 @@ CREATE TABLE student (
     student_id INT PRIMARY KEY,
     student_name VARCHAR(100) NOT NULL,
     student_classes INT,
-    student_face_data ARRAY,
+    student_face_data JSON,
     FOREIGN KEY (student_classes) REFERENCES class(class_id)
 );
 
