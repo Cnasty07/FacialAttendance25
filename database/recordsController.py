@@ -224,7 +224,7 @@ class FaceTable(DatabaseController):
 
 def main():
     """Main function for testing the database functionality."""
-    db_name = 'school.db'
+    db_name = './database/school.db'
 
     # Example usage
     class_table = ClassTable(db_name)

@@ -3,7 +3,7 @@ import cv2
 import face_recognition
 import numpy as np
 import sqlite3
-from ....data.db.recordsController import StudentTable, ClassTable
+from ....database.recordsController import StudentTable, ClassTable
 
 # TODO: get tables from db to add to known faces
 #       1. class specific to pull students from db
