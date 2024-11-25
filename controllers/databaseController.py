@@ -4,6 +4,12 @@ from abc import ABC, abstractmethod
 import os
 import pandas as pd
 
+
+# TODO: Change the face encoding to a numpy array
+# TODO: Add a method to convert the numpy array to a string for storage in the database
+# TODO: Add a method to convert the string back to a numpy array when reading from the database
+
+
 class DatabaseController(ABC):
     def __init__(self, db_name: str = None):
         if db_name is None:
@@ -54,7 +60,8 @@ class DatabaseController(ABC):
 
 
 class ClassTable(DatabaseController):
-    def __init__(self, db_name):
+    def __init__(self, db_name: str = None): 
+        self.db_name = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../database/school.db')
         super().__init__(db_name)
         self.table_name = 'class'
         self.connect()
@@ -104,7 +111,8 @@ class ClassTable(DatabaseController):
     
 class StudentTable(DatabaseController):
     """Class for managing the 'student' table."""
-    def __init__(self, db_name):
+    def __init__(self, db_name: str = None):
+        self.db_name = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../database/school.db')
         super().__init__(db_name)
         self.table_name = 'student'
         self.connect()
@@ -115,7 +123,10 @@ class StudentTable(DatabaseController):
             'face_encodings': []
         }
         df = pd.DataFrame(data)
-        df.to_sql(self.table_name, self.conn, if_exists='append', index=False)
+        try:
+            df.to_sql(self.table_name, self.conn, if_exists='fail', index=False)
+        except ValueError:
+            print(f"Table {self.table_name} already exists.")
 
     def create(self, name, classes, face_encodings):
         """Create a new student record using pandas."""
@@ -168,7 +179,8 @@ class StudentTable(DatabaseController):
 
 class AttendanceTable(DatabaseController):
     """Class for managing the 'attendance' table."""
-    def __init__(self, db_name):
+    def __init__(self, db_name:str = None):
+        self.db_name = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../database/school.db')
         super().__init__(db_name)
         self.table_name = 'attendance'
         self.connect()
@@ -225,6 +237,7 @@ class AttendanceTable(DatabaseController):
 class FaceTable(DatabaseController):
     """Class for managing the 'face' table."""
     def __init__(self, db_name):
+        self.db_name = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../database/school.db')
         super().__init__(db_name)
         self.table_name = 'face'
         self.connect()

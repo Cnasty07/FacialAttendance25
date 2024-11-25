@@ -6,19 +6,29 @@ import pandas as pd
 import components.capture as cap
 import components.comparison as comp
 import components.recognition as rec
-
-# import components for facial system
-# from components.capture import Capture
-# from components.comparison import FacialComparison
-# from components.recognition import FacialRecognition
+import controllers.databaseController as db
+from PIL import Image,ImageDraw
 
 # TODO: Need to fix some boilerplate code
 
 
 class FacialController:
-    def __init__(self, known_faces_dir):
-        self.known_faces_dir = known_faces_dir
+    """_summary_
+    This class is used to control the facial recognition system
+    
+    Args: 
+        class_id (int): The class id to be used for the facial recognition system.
+    
+    Attributes:
+        class_id (int): The class id to be used for the facial recognition system.
+        known_faces (dict): The known faces of the class.
+    """
+    def __init__(self, class_id):
+        self.class_id = class_id
         self.known_faces = self.load_known_faces()
+
+    def load_known_faces(self):
+        return db.ClassTable().read(self.class_id)
 
     # starts the process of checking in a student
     def start_new_entry(self, capture_method: str = None):
@@ -59,13 +69,19 @@ class FacialController:
         return None
 
     # runs a comparison from known faces to the captured face and returns
-    def match_processed_image(self, capture: np.ndarray) -> bool:
+    def match_processed_image(self, capture: np.ndarray = None) -> bool:
         # step 2: compare face to known faces returns {student_id , }
-        new_comparison_data = comp.FacialComparison().compare_faces(capture)
-        # step 3: return result
-        print("Match found: ", new_comparison_data.student_id)
+        capture = face_recognition.load_image_file('./database/tests/Musk3.jpg')
+        class_table = db.ClassTable().read(1)
+        # print(capture)
+        print(class_table[['id','name']].to_string(index=False))
         
-        return new_comparison_data.result
+        
+        # new_comparison_data = comp.FacialComparison.compare_faces(,capture)
+        # step 3: return result
+        # print("Match found: ", new_comparison_data.student_id)
+        
+        # return new_comparison_data.result
 
     
 

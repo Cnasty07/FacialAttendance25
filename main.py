@@ -31,20 +31,6 @@ def activate(root):
     check_in = new_interface.FacialAttendanceSystemApp(root)
     root.protocol("WM_DELETE_WINDOW", check_in.close)
     root.mainloop()
-    
-    # # loop to check everyone in until done.
-    # while True:
-        
-    #     # starts the interface
-    #     check_in = new_interface.FacialAttendanceSystemApp(root)
-        
-        
-        
-
-
-
-    
-    
 
 
 def deactivate():

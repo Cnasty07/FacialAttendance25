@@ -14,19 +14,8 @@ print(os.path.dirname(os.path.relpath(__file__)))
 # INFO: This class is used to compare faces to known faces in the database.
 
 class FacialComparison:
-    def __init__(self,db_path = None):
-        try:
-            # {student_id: img_encoding_array}
-            df = pd.read_sql_table('class', '../../../database/school_json.db')
-            self.known_faces = df.json()
-        except Exception as e:
-            print(f"Error: {e}\n Defaulting to empty list.")
-            self.known_faces = np.ndarray([])
-        finally:
-            print("Known faces loaded.")
-
     @staticmethod
-    def compare_faces(self,new_img: np.ndarray = None) -> dict:
+    def compare_faces(known_faces_encodings,new_img_encodings: np.ndarray = None) -> dict:
         """_summary_
         Checks database for a match of the new image. If found returns the student_id and the result of the comparison.
         If not found returns None.
@@ -36,16 +25,17 @@ class FacialComparison:
             dict: _description_
         """
         # image comparison to see if the image is the same person in database
-        for student_id,student_img_encoding in self.known_faces.keys():    
-            result = face_recognition.compare_faces([student_img_encoding], new_img)
+        for student_id,student_img_encoding in known_faces_encodings.keys():    
+            result = face_recognition.compare_faces([student_img_encoding], new_img_encodings)
             if result:
                 found_student = {"student_id": student_id, "result": result}
-                self.comparison_accuracy(student_img_encoding,new_img)
+                FacialComparison.comparison_accuracy(student_img_encoding,new_img_encodings)
                 return found_student
                 
         return None
     
-    def comparison_accuracy(self,student_facial_imgs = None,new_img: np.ndarray = None) -> np.linalg.norm :
+    @staticmethod
+    def comparison_accuracy(student_facial_imgs = None,new_img: np.ndarray = None) -> np.linalg.norm :
         # accuracy of prediction
         face_distance = face_recognition.face_distance([student_facial_imgs], new_img)
         return face_distance

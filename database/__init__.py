@@ -1,3 +1,3 @@
 from . import *
 
-__all__ = ['recordsController','school.db']
+__all__ = ['recordsController','school.db','tests']
