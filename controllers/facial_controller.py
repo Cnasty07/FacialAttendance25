@@ -2,12 +2,15 @@ import os
 import face_recognition
 import dlib
 import numpy as np
-
+import pandas as pd
+import components.capture as cap
+import components.comparison as comp
+import components.recognition as rec
 
 # import components for facial system
-from components.capture import Capture
-from components.comparison import FacialComparison
-from components.recognition import FacialRecognition
+# from components.capture import Capture
+# from components.comparison import FacialComparison
+# from components.recognition import FacialRecognition
 
 # TODO: Need to fix some boilerplate code
 
@@ -35,7 +38,7 @@ class FacialController:
     # step 1: capture face
     def capture_entry(self,capture_method: str = None) -> np.ndarray:
         try:
-            capture = Capture(capture_method)
+            capture = cap.Capture(capture_method)
         except Exception as e:
             print("Error: ", e)
             print("Could not capture image. Please try again.")
@@ -46,7 +49,7 @@ class FacialController:
     def process_image(self,capture: str = None):
         try:
             # get the face location and encoding
-            new_face = FacialRecognition(capture)
+            new_face = rec.FacialRecognition(capture)
             # compare the face to known faces
             new_comparison_data = new_face.compare_faces
             return new_comparison_data
@@ -58,10 +61,11 @@ class FacialController:
     # runs a comparison from known faces to the captured face and returns
     def match_processed_image(self, capture: np.ndarray) -> bool:
         # step 2: compare face to known faces returns {student_id , }
-        new_comparison_data = FacialComparison().compare_faces(capture)
+        new_comparison_data = comp.FacialComparison().compare_faces(capture)
         # step 3: return result
         print("Match found: ", new_comparison_data.student_id)
-        pass
+        
+        return new_comparison_data.result
 
     
 

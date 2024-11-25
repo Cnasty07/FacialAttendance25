@@ -3,14 +3,18 @@ import face_recognition
 import dlib
 import numpy as np
 import pandas as pd
+
 try:
-    from ...controllers import ClassTable, StudentTable
-except:
-    
-    from ...controllers.databaseController import ClassTable, StudentTable
+    from ... import controllers
+except ImportError:
+    from controllers import databaseController as db
+
+print(os.path.dirname(os.path.relpath(__file__)))
+
+# INFO: This class is used to compare faces to known faces in the database.
+
 class FacialComparison:
-    def __init__(self):
-        # TODO: make query for comparison between faces
+    def __init__(self,db_path = None):
         try:
             # {student_id: img_encoding_array}
             df = pd.read_sql_table('class', '../../../database/school_json.db')
@@ -20,7 +24,8 @@ class FacialComparison:
             self.known_faces = np.ndarray([])
         finally:
             print("Known faces loaded.")
-    
+
+    @staticmethod
     def compare_faces(self,new_img: np.ndarray = None) -> dict:
         """_summary_
         Checks database for a match of the new image. If found returns the student_id and the result of the comparison.
@@ -47,6 +52,12 @@ class FacialComparison:
     
     
 def main():
+    os.add_dll_directory(os.environ['CUDA_PATH'])
+    dlib.DLIB_USE_CUDA = True
+    if dlib.DLIB_USE_CUDA:
+        print("Using CUDA for dlib.")
+    else:
+        print("CUDA is not available for dlib.")
     new_comparison = FacialComparison()
     new_comparison.compare_faces()
 

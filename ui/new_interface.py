@@ -1,47 +1,66 @@
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
+
 import datetime
 import tkinter as tk
-from tkinter import Label, Button , ttk 
+from tkinter import ttk
+from tkinter import Label, Button
 import cv2
 from PIL import Image, ImageTk
 import threading
+from controllers.databaseController import ClassTable
 
 class FacialAttendanceSystemApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Facial Attendance System")
         self.root.geometry("800x600")
+        self.root.configure(background="grey")
 
         # Title
         self.title_label = Label(root, text="Facial Attendance System", font=("Helvetica", 20, "bold"))
         self.title_label.pack(pady=10)
         
-        # FIXME: Implement the class list from the database
-        # Class List
-        # classes_list = ClassTable("./database/school.db").read_all()
-        # print(classes_list)
-
+        try:
+            # Class List
+            classes_list = ClassTable("./database/school.db").read_all()
+            print(classes_list)
+        except Exception as e:
+            print(f"An error occurred: {e}")
+        
         def on_select(event):
             selected_item = self.class_list.get()
-        self.class_list = ttk.Combobox(root,values= ["Math 101","Math 102","Math 103","Math 104","Math 105"])
+        # Extract class names for the combobox
+        class_names = [cls for cls in classes_list['name']]
+        # Class List Dropdown
+        self.class_list = ttk.Combobox(root)
+        self.class_list['values'] = class_names
         self.class_list.set("Select Class")
         self.class_list.bind("<<ComboboxSelected>>",on_select)
         self.class_list.pack(pady=10)
 
         # Camera Feed Frame
-        self.camera_frame = Label(root)
-        self.camera_frame.pack(pady=10, expand=True, fill="both")
+        self.camera_frame = Label(root, width=200, height=400)
+        self.camera_frame.pack(pady=10, expand=False, fill="both")
+        
+        # Input field
+        self.input_label = Label(root, text="Enter Student Name:", font=("Helvetica", 14))
+        self.input_label.pack(pady=5)
+        self.input_entry = tk.Entry(root, font=("Helvetica", 14))
+        self.input_entry.pack(pady=5)
 
         # Record Attendance Button
         self.record_button = Button(
             root,
             text="Record Attendance",
             font=("Helvetica", 14),
-            command=self.record_attendance  # Placeholder for the method to be hooked up later
+            command=self.record_attendance
         )
         self.record_button.pack(pady=10)
 
         # Initialize camera and thread
-        self.cap = cv2.VideoCapture(0)  # Open the default camera (index 0)
+        self.cap = cv2.VideoCapture(0)  # Open the default camera
         self.running = True
         self.update_camera()
 
@@ -92,9 +111,12 @@ class FacialAttendanceSystemApp:
 
     def record_attendance(self):
         """Method to simulate attendance recording and open the confirmation window."""
-        # Simulate getting student name and class name (replace this with real data later)
+        # Simulate getting student name and class name (replace this with real data)
         student_name = "John Doe"
-        class_name = "Math 101"
+        class_name = "CSCI 3366"
+
+        if self.input_entry.get() != "":
+            student_name = self.input_entry.get()
 
         # Open the confirmation window
         threading.Thread(target=self.confirm_attendance, args=(student_name, class_name)).start()

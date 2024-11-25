@@ -4,11 +4,8 @@ import face_recognition
 import numpy as np
 import sqlite3
 import pandas as pd
+import controllers.databaseController as db
 
-try:
-    from ...controllers.databaseController import ClassTable, StudentTable
-except:
-    from controllers.databaseController import ClassTable, StudentTable     
 
 
 # TODO: get tables from db to add to known faces
@@ -25,7 +22,7 @@ class KnownFaces:
 
     def load_known_faces(self,class_id):
         # gets class id from interface
-        class_table = ClassTable()
+        class_table = db.ClassTable()
         class_table.read(class_id=class_id)
         student_ids_for_class = class_table.read(class_id=class_id)
 

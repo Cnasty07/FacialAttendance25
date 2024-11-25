@@ -7,9 +7,10 @@ import pandas as pd
 class DatabaseController(ABC):
     def __init__(self, db_name: str = None):
         if db_name is None:
-            db_name = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../database/school.db')
+            db_name = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../database/school.db')
         else :
             self.db_name = db_name
+        self.table_name = None
         self.conn = None
         self.cursor = None
 
@@ -55,6 +56,7 @@ class DatabaseController(ABC):
 class ClassTable(DatabaseController):
     def __init__(self, db_name):
         super().__init__(db_name)
+        self.table_name = 'class'
         self.connect()
 
 
@@ -69,14 +71,14 @@ class ClassTable(DatabaseController):
             'time': [time]
         }
         df = pd.DataFrame(data)
-        df.to_sql('class', self.conn, if_exists='append', index=False)
+        df.to_sql(self.table_name, self.conn, if_exists='append', index=False)
 
     def read(self, class_id=None):
         """Read a class record using pandas."""
         if class_id:
-            return pd.read_sql_query(f"SELECT * FROM class WHERE id = {class_id}", self.conn)
+            return pd.read_sql_query(f"SELECT * FROM {self.table_name} WHERE id = {class_id}", self.conn)
         else:
-            return pd.read_sql_query("SELECT * FROM class", self.conn)
+            return pd.read_sql_query(f"SELECT * FROM {self.table_name}", self.conn)
         
     def read_all(self):
         """Read all class records using pandas."""
@@ -93,17 +95,18 @@ class ClassTable(DatabaseController):
             'time': time
         }
         df = pd.DataFrame([data])
-        df.to_sql('class', self.conn, if_exists='replace', index=False, method='multi', chunksize=1000)
+        df.to_sql(self.table_name, self.conn, if_exists='replace', index=False, method='multi', chunksize=1000)
 
     def delete(self, class_id):
         """Delete a class record using pandas."""
-        query = f"DELETE FROM class WHERE id = {class_id}"
+        query = f"DELETE FROM {self.table_name} WHERE id = {class_id}"
         self.execute_query(query)
     
 class StudentTable(DatabaseController):
     """Class for managing the 'student' table."""
     def __init__(self, db_name):
         super().__init__(db_name)
+        self.table_name = 'student'
         self.connect()
         data = {
             'id': [],
@@ -112,7 +115,7 @@ class StudentTable(DatabaseController):
             'face_encodings': []
         }
         df = pd.DataFrame(data)
-        df.to_sql('student', self.conn, if_exists='append', index=False)
+        df.to_sql(self.table_name, self.conn, if_exists='append', index=False)
 
     def create(self, name, classes, face_encodings):
         """Create a new student record using pandas."""
@@ -123,7 +126,7 @@ class StudentTable(DatabaseController):
             'face_encodings': [encoding_json]
         }
         df = pd.DataFrame(data)
-        df.to_sql('student', self.conn, if_exists='append', index=False)
+        df.to_sql(self.table_name, self.conn, if_exists='append', index=False)
 
     def read(self, student_id=None):
         """Read a student record using pandas."""
@@ -155,11 +158,11 @@ class StudentTable(DatabaseController):
             'face_encodings': encoding_json
         }
         df = pd.DataFrame([data])
-        df.to_sql('student', self.conn, if_exists='replace', index=False, method='multi', chunksize=1000)
+        df.to_sql(self.table_name, self.conn, if_exists='replace', index=False, method='multi', chunksize=1000)
 
     def delete(self, student_id):
         """Delete a student record using pandas."""
-        query = f"DELETE FROM student WHERE id = {student_id}"
+        query = f"DELETE FROM {self.table_name} WHERE id = {student_id}"
         self.execute_query(query)
 
 
@@ -167,6 +170,7 @@ class AttendanceTable(DatabaseController):
     """Class for managing the 'attendance' table."""
     def __init__(self, db_name):
         super().__init__(db_name)
+        self.table_name = 'attendance'
         self.connect()
         data = {
             'id': [],
@@ -176,7 +180,7 @@ class AttendanceTable(DatabaseController):
             'status': []
         }
         df = pd.DataFrame(data)
-        df.to_sql('attendance', self.conn, if_exists='append', index=False)
+        df.to_sql(self.table_name, self.conn, if_exists='append', index=False)
 
     def create(self, class_id, student_id, date, status):
         """Create a new attendance record using pandas."""
@@ -189,14 +193,14 @@ class AttendanceTable(DatabaseController):
             'status': [status]
         }
         df = pd.DataFrame(data)
-        df.to_sql('attendance', self.conn, if_exists='append', index=False)
+        df.to_sql(self.table_name, self.conn, if_exists='append', index=False)
 
     def read(self, attendance_id=None):
         """Read an attendance record using pandas."""
         if attendance_id:
-            return pd.read_sql_query(f"SELECT * FROM attendance WHERE id = {attendance_id}", self.conn)
+            return pd.read_sql_query(f"SELECT * FROM {self.table_name} WHERE id = {attendance_id}", self.conn)
         else:
-            return pd.read_sql_query("SELECT * FROM attendance", self.conn)
+            return pd.read_sql_query(f"SELECT * FROM {self.table_name}", self.conn)
 
     def filter_by_class(self, class_id):
         """Filter attendance records by class ID using pandas."""
@@ -222,6 +226,7 @@ class FaceTable(DatabaseController):
     """Class for managing the 'face' table."""
     def __init__(self, db_name):
         super().__init__(db_name)
+        self.table_name = 'face'
         self.connect()
         data = {
             'id': [],
@@ -229,7 +234,7 @@ class FaceTable(DatabaseController):
             'encoding': []
         }
         df = pd.DataFrame(data)
-        df.to_sql('face', self.conn, if_exists='append', index=False)
+        df.to_sql(self.table_name, self.conn, if_exists='append', index=False)
 
     def create(self, student_id, encoding):
         """Create a new face encoding record using pandas."""
@@ -239,24 +244,24 @@ class FaceTable(DatabaseController):
             'encoding': [encoding_json]
         }
         df = pd.DataFrame(data)
-        df.to_sql('face', self.conn, if_exists='append', index=False)
+        df.to_sql(self.table_name, self.conn, if_exists='append', index=False)
 
     def read(self, face_id=None):
         """Read a face encoding record using pandas."""
         if face_id:
-            df = pd.read_sql_query(f"SELECT * FROM face WHERE id = {face_id}", self.conn)
+            df = pd.read_sql_query(f"SELECT * FROM {self.table_name} WHERE id = {face_id}", self.conn)
             if not df.empty:
                 df['encoding'] = df['encoding'].apply(json.loads)
             return df
         else:
-            df = pd.read_sql_query("SELECT * FROM face", self.conn)
+            df = pd.read_sql_query(f"SELECT * FROM {self.table_name}", self.conn)
             if not df.empty:
                 df['encoding'] = df['encoding'].apply(json.loads)
             return df
 
     def find_by_student(self, student_id):
         """Find all face encodings for a student using pandas."""
-        df = pd.read_sql_query(f"SELECT * FROM face WHERE student_id = {student_id}", self.conn)
+        df = pd.read_sql_query(f"SELECT * FROM {self.table_name} WHERE student_id = {student_id}", self.conn)
         if not df.empty:
             df['encoding'] = df['encoding'].apply(json.loads)
         return df
@@ -265,12 +270,12 @@ class FaceTable(DatabaseController):
         """Update a face encoding record using pandas."""
         encoding_json = json.dumps(encoding)
         self.execute_query(
-            f"UPDATE face SET student_id = {student_id}, encoding = '{encoding_json}' WHERE id = {face_id}"
+            f"UPDATE {self.table_name} SET student_id = {student_id}, encoding = '{encoding_json}' WHERE id = {face_id}"
         )
 
     def delete(self, face_id):
         """Delete a face encoding record using pandas."""
-        self.execute_query(f"DELETE FROM face WHERE id = {face_id}")
+        self.execute_query(f"DELETE FROM {self.table_name} WHERE id = {face_id}")
 
 
 def main():
