@@ -1,9 +1,15 @@
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
+
 import datetime
 import tkinter as tk
+from tkinter import ttk
 from tkinter import Label, Button
 import cv2
 from PIL import Image, ImageTk
 import threading
+from data.db.recordsController import ClassTable
 
 
 class FacialAttendanceSystemApp:
@@ -16,6 +22,20 @@ class FacialAttendanceSystemApp:
         # Title
         self.title_label = Label(root, text="Facial Attendance System", font=("Helvetica", 20, "bold"))
         self.title_label.pack(pady=10)
+        
+        try:
+            # Class List
+            classes_list = ClassTable("./database/school.db").read_all()
+            print(classes_list)
+        except Exception as e:
+            print(f"An error occurred: {e}")
+        
+        def on_select(event):
+            selected_item = self.class_list.get()
+        self.class_list = ttk.Combobox(root,classes_list)
+        self.class_list.set("Select Class")
+        self.class_list.bind("<<ComboboxSelected>>",on_select)
+        self.class_list.pack(pady=10)
 
         # Camera Feed Frame
         self.camera_frame = Label(root, width=200, height=400)
