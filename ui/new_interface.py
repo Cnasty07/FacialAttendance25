@@ -95,29 +95,7 @@ class FacialAttendanceSystemApp:
         load_known_faces = FacialController.load_known_faces()
         
         # Compare the unknown face to the known faces
-        is_match = FacialController.match_processed_image(unknown_face,load_known_faces)
-
-        # Generate current date and time
-        current_time = datetime.now()
-        formatted_time = current_time.strftime("%Y-%m-%d %H:%M:%S")
-
-        if is_match[0]:
-            message = (f"Successfully recorded student {student_name} "
-                    f"on {formatted_time} for class {class_name}.")
-        else:
-            message = "No match found. Attendance not recorded."
-
-        # Show confirmation message in a new window
-
-    def confirm_attendance(self, student_name, class_name, face_path):
-        """Match face and confirm attendance."""
-        # Process and match face loads image and gets encoding
-        unknown_face = FacialController.process_image(face_path)
-        # retrieves the known faces from the database
-        load_known_faces = FacialController.load_known_faces()
-        
-        # Compare the unknown face to the known faces
-        is_match = FacialController.match_processed_image([load_known_faces], unknown_face)
+        is_match = FacialController.match_processed_image(unknown_face, load_known_faces)
 
         # Generate current date and time
         current_time = datetime.now()
