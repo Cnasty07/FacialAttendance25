@@ -34,6 +34,13 @@ class FacialController:
 
         # load the known faces from the database that should be the encodings
         load_students = db.StudentTable().read()
+        # new_dataframe = load_students[['id', 'face_encodings']]
+        # known_faces = {}
+        # for index, row in new_dataframe.iterrows():
+        #     student_id = row['id']
+        #     face_encoding = np.array(row['face_encodings'])
+        #     known_faces[student_id] = face_encoding
+        # print(known_faces)
         known_faces = load_students['face_encodings'].to_numpy()
         print("loading faces: ",type(known_faces))
         return np.array(known_faces[0])

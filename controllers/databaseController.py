@@ -145,7 +145,6 @@ class StudentTable(DatabaseController):
             df = pd.read_sql_query(f"SELECT * FROM {self.table_name} WHERE id = {student_id}", self.conn)
             if not df.empty:
                 df['face_encodings'] = df['face_encodings'].apply(json.loads)
-                pass
             return df
         else:
             df = pd.read_sql_query(f"SELECT * FROM {self.table_name}", self.conn)
