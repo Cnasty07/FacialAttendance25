@@ -1,7 +1,6 @@
 import sys
 import os
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
-
+import numpy as np
 import datetime
 import tkinter as tk
 from tkinter import ttk
@@ -74,7 +73,7 @@ class FacialAttendanceSystemApp:
             return
 
         
-
+        unknown_face = np.ndarray([])
         ret, frame = self.cap.read()
         if ret:
             # Convert BGR (OpenCV) to RGB (Pillow)
@@ -85,15 +84,15 @@ class FacialAttendanceSystemApp:
             self.camera_frame.configure(image=frame_image)
             self.camera_frame.image = frame_image
         
-        # Get the current date and time
-        now = datetime.now()
-        # Format the date and time to include in the file path
-        timestamp = now.strftime("%Y%m%d_%H%M%S")
-        # Save the captured image to the specified path with the timestamp
-        file_path = f'./database/captures/captured_image_{timestamp}.jpg'
-        # Save the captured image to the specified path
-        cv2.imwrite(file_path, frame)
-        unknown_face = FacialController.process_image(file_path)
+            # Get the current date and time
+            now = datetime.now()
+            # Format the date and time to include in the file path
+            timestamp = now.strftime("%Y%m%d_%H%M%S")
+            # Save the captured image to the specified path with the timestamp
+            file_path = f'./database/captures/captured_image_{timestamp}.jpg'
+            # Save the captured image to the specified path
+            cv2.imwrite(file_path, frame)
+            unknown_face = FacialController.process_image(file_path)
         
         # Schedule the next update
         self.root.after(10, self.update_camera)
