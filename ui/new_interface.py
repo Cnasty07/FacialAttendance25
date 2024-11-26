@@ -1,5 +1,6 @@
 import sys
 import os
+import face_recognition.face_detection_cli
 import numpy as np
 import datetime
 import tkinter as tk
@@ -9,6 +10,7 @@ import cv2
 from PIL import Image, ImageTk
 import threading
 from datetime import datetime
+import face_recognition
 # adding database and facial system to 
 from controllers.databaseController import ClassTable
 from controllers.facial_controller import FacialController
@@ -20,6 +22,7 @@ class FacialAttendanceSystemApp:
         self.root.title("Facial Attendance System")
         self.root.geometry("800x600")
         self.root.configure(background="grey")
+        self.file_path = ""
 
         # Title
         self.title_label = Label(root, text="Facial Attendance System", font=("Helvetica", 20, "bold"))
@@ -72,33 +75,66 @@ class FacialAttendanceSystemApp:
         if not self.running:
             return
 
-        
-        unknown_face = np.ndarray([])
         ret, frame = self.cap.read()
         if ret:
-            # Convert BGR (OpenCV) to RGB (Pillow)
-            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            if frame is None:
+                print("Error: Could not read frame.")
             frame_image = ImageTk.PhotoImage(Image.fromarray(frame))
-
+            
+            
+            self.detect_faces(frame)
             # Update the frame
             self.camera_frame.configure(image=frame_image)
             self.camera_frame.image = frame_image
         
-            # Get the current date and time
-            now = datetime.now()
-            # Format the date and time to include in the file path
-            timestamp = now.strftime("%Y%m%d_%H%M%S")
-            # Save the captured image to the specified path with the timestamp
-            file_path = f'./database/captures/captured_image_{timestamp}.jpg'
-            # Save the captured image to the specified path
-            cv2.imwrite(file_path, frame)
-            unknown_face = FacialController.process_image(file_path)
+            
+            
+        # if ret:
+        #     # Convert BGR (OpenCV) to RGB (Pillow)
+        #     frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        #     frame_image = ImageTk.PhotoImage(Image.fromarray(frame))
+                        
+        #     # Update the frame
+        #     self.camera_frame.configure(image=frame_image)
+        #     self.camera_frame.image = frame_image
         
+        #     # Get the current date and time
+        #     now = datetime.now()
+        #     # Format the date and time to include in the file path
+        #     timestamp = now.strftime("%Y%m%d_%H%M%S")
+        #     # Save the captured image to the specified path with the timestamp
+        #     self.file_path = f'./database/captures/captured_image_{timestamp}.jpg'
+        #     # Save the captured image to the specified path
+        # Detect faces in the frame
+
         # Schedule the next update
         self.root.after(10, self.update_camera)
+        
+    def detect_faces(self, frame):
+        """Detect faces in the frame."""
+        try : 
+            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+            frame_gray = cv2.equalizeHist(gray)
+            
+            face_cascade = cv2.CascadeClassifier()
+            detect = face_cascade.detectMultiScale(frame_gray)
+            if len(detect) == 0:
+                print("No face detected")
+            else:
+                for (x, y, w, h) in detect:
+                    cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
+                    roi_color = frame[y:y+h, x:x+w]
+                    unknown_face = roi_color
+                    print("Face detected")
+        except Exception as e:
+            print(f"An error occurred: {e}")
+        # Convert the frame to grayscale
+        # Detect faces in the frame
+    
     
     def confirm_attendance(self, student_name, class_name,unknown_face):
         
+        unknown_face = FacialController.process_image(self.file_path)
         if FacialController.match_processed_image(unknown_face):
             """Method for attendance confirmation window."""
             self.confirm_window = tk.Toplevel(self.root)
@@ -128,6 +164,7 @@ class FacialAttendanceSystemApp:
             close_button.pack(pady=10)
         else:
             print("No match found. Attendance not confirmed.")
+            self.update_camera()
             
 
     def record_attendance(self):
