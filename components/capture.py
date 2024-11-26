@@ -2,6 +2,7 @@ import os
 import cv2
 import face_recognition
 from datetime import datetime
+import numpy as np
 
 ### INFO: A class to capture the image or video that is callable.
 class Capture:
@@ -32,8 +33,9 @@ class Capture:
         # used for testing
         elif capture_method == 'stored':
              self.start_return_image()
-        
-    def start_video_capture(self):
+    
+    @staticmethod
+    def start_video_capture(self) -> np.ndarray:
         cap = cv2.VideoCapture(0)
         
         if not cap.isOpened():
@@ -65,8 +67,9 @@ class Capture:
         
         # not sure if this method works on videos yet
         return face_recognition.load_image_file(frame)
-        
-    def start_image_capture(self):
+    
+    @staticmethod
+    def start_image_capture() -> np.ndarray:
         cap = cv2.VideoCapture(0)
         
         if not cap.isOpened():
@@ -97,6 +100,7 @@ class Capture:
         
         return face_recognition.load_image_file(file_path)
 
+    @staticmethod
     def start_return_image(self):
         return face_recognition.load_image_file('../../database/tests/Musk3.jpg')
 

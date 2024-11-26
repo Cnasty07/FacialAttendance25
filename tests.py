@@ -5,6 +5,18 @@ import database
 import ui
 from controllers import facial_controller , databaseController
 
+def add_database_entry(table_name, entry_data):
+    if table_name == 'student':
+        databaseController.StudentTable().create(entry_data)
+    elif table_name == 'class':
+        databaseController.ClassTable().create(entry_data)
+    else:
+        print("Invalid table name")
+
+# Example usage:
+# add_database_entry('student', {'name': 'John Doe', 'id': 123})
+# add_database_entry('class', {'name': 'Math 101', 'id': 456})
+
 def test_database():
     # class_table = databaseController.ClassTable().read(1)
     

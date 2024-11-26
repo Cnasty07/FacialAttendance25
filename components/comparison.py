@@ -4,16 +4,14 @@ import dlib
 import numpy as np
 import pandas as pd
 
-try:
-    from ... import controllers
-except ImportError:
-    from controllers import databaseController as db
+from controllers.databaseController import ClassTable
 
 print(os.path.dirname(os.path.relpath(__file__)))
 
 # INFO: This class is used to compare faces to known faces in the database.
 
 class FacialComparison:
+    
     @staticmethod
     def compare_faces(known_faces_encodings,new_img_encodings: np.ndarray = None) -> dict:
         """_summary_
@@ -24,6 +22,10 @@ class FacialComparison:
         Returns:
             dict: _description_
         """
+        
+        class_data = ClassTable().read(1)
+        known_faces_encodings = {student_id: face_encoding for student_id, face_encoding in class_data}
+        
         # image comparison to see if the image is the same person in database
         for student_id,student_img_encoding in known_faces_encodings.keys():    
             result = face_recognition.compare_faces([student_img_encoding], new_img_encodings)

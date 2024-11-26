@@ -23,9 +23,9 @@ class FacialController:
         class_id (int): The class id to be used for the facial recognition system.
         known_faces (dict): The known faces of the class.
     """
-    def __init__(self, class_id):
-        self.class_id = class_id
-        self.known_faces = self.load_known_faces()
+    # def __init__(self, class_id):
+    #     self.class_id = class_id
+    #     self.known_faces = self.load_known_faces()
 
     def load_known_faces(self):
         return db.ClassTable().read(self.class_id)
@@ -45,8 +45,9 @@ class FacialController:
 
         return "Check in complete."
 
+    @staticmethod
     # step 1: capture face
-    def capture_entry(self,capture_method: str = None) -> np.ndarray:
+    def capture_entry(capture_method: str = None) -> np.ndarray:
         try:
             capture = cap.Capture(capture_method)
         except Exception as e:
@@ -54,34 +55,31 @@ class FacialController:
             print("Could not capture image. Please try again.")
         return capture
         
-
-    # step 2: process image. Gets the face location , encoding, and comparison 
+    @staticmethod
+    # step 2: process image. Gets the face location , encoding, and comparison using recognition module
     def process_image(self,capture: str = None):
         try:
             # get the face location and encoding
             new_face = rec.FacialRecognition(capture)
             # compare the face to known faces
-            new_comparison_data = new_face.compare_faces
-            return new_comparison_data
+            new_face_encoding = new_face.get_face_encoding()
+            return new_face_encoding
         except Exception as e:
             print("Error: ", e)
             print("Could not process image. Please try again.")
         return None
 
     # runs a comparison from known faces to the captured face and returns
-    def match_processed_image(self, capture: np.ndarray = None) -> bool:
-        # step 2: compare face to known faces returns {student_id , }
-        capture = face_recognition.load_image_file('./database/tests/Musk3.jpg')
-        class_table = db.ClassTable().read(1)
-        # print(capture)
-        print(class_table[['id','name']].to_string(index=False))
+    @staticmethod
+    def match_processed_image(capture: np.ndarray, known_faces: np.ndarray) -> bool:
         
-        
-        # new_comparison_data = comp.FacialComparison.compare_faces(,capture)
+        load_students = db.StudentTable().read()
+        known_faces = {load_students['student_id']: load_students['face_encoding']}
+        new_comparison_data = comp.FacialComparison.compare_faces(known_faces,capture)
         # step 3: return result
         # print("Match found: ", new_comparison_data.student_id)
         
-        # return new_comparison_data.result
+        return new_comparison_data.result
 
     
 

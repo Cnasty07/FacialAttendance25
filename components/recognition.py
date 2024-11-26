@@ -10,9 +10,16 @@ class FacialRecognition:
         self.img_path = img_path
         self.img_face_encoding = self.get_face_encoding()
     
+    
     def find_face(self):
+        """_summary_
+            This function finds the face in the image
+        Returns:
+            _type_: list
+        """
         find_face_in = face_recognition.face_locations(self.img_path)
         return find_face_in
+    
     
     def get_face_encoding(self):
         img = face_recognition.load_image_file(self.img_path)
@@ -21,6 +28,7 @@ class FacialRecognition:
             exit()
         img_encoding = face_recognition.face_encodings(img)[0]
         return img_encoding
+    
     
     def show_faces(self):
         # ideally only one face when checking in.

@@ -20,33 +20,16 @@ class KnownFaces:
             self.known_face_encodings = []
             self.known_face_names = []
 
+    
     def load_known_faces(self,class_id):
         # gets class id from interface
         class_table = db.ClassTable()
         class_table.read(class_id=class_id)
         student_ids_for_class = class_table.read(class_id=class_id)
 
-        # fetches student ids for class
-
-        # fetches student face data for each student
-        # adds student face data to known faces
-        # student_table_data = StudentTable(self.db_path)
-        
-        # for student_id in student_ids_for_class:
-        #     student_table_data.cursor.execute("SELECT student_id, student_face_data FROM student WHERE class_id = ?", (class_id,))
-        #     student_face_data = student_table_data.read(student_id)
-        #     self.known_face_encodings.append(student_face_data)
-        #     self.known_face_names.append(student_id)
-            
-        # # cursor.execute("SELECT , student_id, student_face_data FROM student")
-        # rows = class_table.cursor.fetchall()
-        # for row in rows:
-        #     name, encoding = row
-        #     encoding = np.frombuffer(encoding, dtype=np.float64)
-        #     self.known_face_encodings.append(encoding)
-        #     self.known_face_names.append(name)
         class_table.conn.close()
-
+        
+    @staticmethod
     def get_known_faces(self):
         return self.known_face_encodings, self.known_face_names
     

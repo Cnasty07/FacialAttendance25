@@ -20,6 +20,7 @@ class DatabaseController(ABC):
         self.conn = None
         self.cursor = None
 
+    # connects to the database
     def connect(self):
         try:
             self.conn = sqlite3.connect(self.db_name)
@@ -27,10 +28,12 @@ class DatabaseController(ABC):
         except sqlite3.Error as e:
             print(f"Failed to connect to the database: {e}")
 
+    # closes the connection to the database
     def close(self):
         if self.conn:
             self.conn.close()
 
+    # mainly used for delete query
     def execute_query(self, query, params=()):
         try:
             self.cursor.execute(query, params)
@@ -39,17 +42,17 @@ class DatabaseController(ABC):
             print(f"Database query failed: {e}")
     
     @abstractmethod
-    def create(self, *args, **kwargs):
+    def create(self, *args, **kwargs) -> None:
         pass
 
-    @abstractmethod
-    def read(self, *args, **kwargs):
-        pass
-
-    @abstractmethod
-    def read_all(self, *args, **kwargs):
-        pass
-
+    # reads the table () if no selected table id is given then it reads all the table
+    def read(self,selected_table_id = None) -> pd.DataFrame:
+        """Read a class record using pandas."""
+        if selected_table_id:
+            return pd.read_sql_query(f"SELECT * FROM {self.table_name} WHERE id = {selected_table_id}", self.conn)
+        else:
+            return pd.read_sql_query(f"SELECT * FROM {self.table_name}", self.conn)
+    
     @abstractmethod
     def update(self, *args, **kwargs):
         pass
@@ -80,16 +83,8 @@ class ClassTable(DatabaseController):
         df = pd.DataFrame(data)
         df.to_sql(self.table_name, self.conn, if_exists='append', index=False)
 
-    def read(self, class_id=None):
-        """Read a class record using pandas."""
-        if class_id:
-            return pd.read_sql_query(f"SELECT * FROM {self.table_name} WHERE id = {class_id}", self.conn)
-        else:
-            return pd.read_sql_query(f"SELECT * FROM {self.table_name}", self.conn)
         
-    def read_all(self):
-        """Read all class records using pandas."""
-        return pd.read_sql_query("SELECT * FROM class", self.conn)
+    
     
     def update(self, class_id, name, room_number, description, start_date, end_date, time):
         """Update a class record using pandas."""
@@ -139,22 +134,22 @@ class StudentTable(DatabaseController):
         df = pd.DataFrame(data)
         df.to_sql(self.table_name, self.conn, if_exists='append', index=False)
 
-    def read(self, student_id=None):
+    def read(self, student_id=None) -> pd.DataFrame:
         """Read a student record using pandas."""
         if student_id:
-            df = pd.read_sql_query(f"SELECT * FROM student WHERE id = {student_id}", self.conn)
+            df = pd.read_sql_query(f"SELECT * FROM {self.table_name} WHERE id = {student_id}", self.conn)
             if not df.empty:
                 df['face_encodings'] = df['face_encodings'].apply(json.loads)
             return df
         else:
-            df = pd.read_sql_query("SELECT * FROM student", self.conn)
+            df = pd.read_sql_query(f"SELECT * FROM {self.table_name}", self.conn)
             if not df.empty:
                 df['face_encodings'] = df['face_encodings'].apply(json.loads)
             return df
 
     def read_all(self):
         """Read all student records using pandas."""
-        df = pd.read_sql_query("SELECT * FROM student", self.conn)
+        df = pd.read_sql_query(f"SELECT * FROM {self.table_name}", self.conn)
         if not df.empty:
             df['face_encodings'] = df['face_encodings'].apply(json.loads)
         return df
@@ -207,12 +202,6 @@ class AttendanceTable(DatabaseController):
         df = pd.DataFrame(data)
         df.to_sql(self.table_name, self.conn, if_exists='append', index=False)
 
-    def read(self, attendance_id=None):
-        """Read an attendance record using pandas."""
-        if attendance_id:
-            return pd.read_sql_query(f"SELECT * FROM {self.table_name} WHERE id = {attendance_id}", self.conn)
-        else:
-            return pd.read_sql_query(f"SELECT * FROM {self.table_name}", self.conn)
 
     def filter_by_class(self, class_id):
         """Filter attendance records by class ID using pandas."""
