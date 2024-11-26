@@ -3,6 +3,9 @@ import cv2
 import dlib
 import face_recognition
 import tkinter as tk
+from ui import new_interface
+from controllers import facial_controller , databaseController
+
 # local imports 
 try:
     from controllers import facial_controller , databaseController

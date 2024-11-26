@@ -68,79 +68,81 @@ class FacialAttendanceSystemApp:
         self.update_camera()
 
     def update_camera(self):
-        """Update the camera feed in the GUI."""
+        """Update the camera feed in the GUI with optional face detection."""
         if not self.running:
             return
 
-        
-        unknown_face = np.ndarray([])
         ret, frame = self.cap.read()
         if ret:
             # Convert BGR (OpenCV) to RGB (Pillow)
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            frame_image = ImageTk.PhotoImage(Image.fromarray(frame))
 
-            # Update the frame
+            frame_image = ImageTk.PhotoImage(Image.fromarray(frame))
             self.camera_frame.configure(image=frame_image)
             self.camera_frame.image = frame_image
-        
-            # Get the current date and time
-            now = datetime.now()
-            # Format the date and time to include in the file path
-            timestamp = now.strftime("%Y%m%d_%H%M%S")
-            # Save the captured image to the specified path with the timestamp
-            file_path = f'./database/captures/captured_image_{timestamp}.jpg'
-            # Save the captured image to the specified path
-            cv2.imwrite(file_path, frame)
-            unknown_face = FacialController.process_image(file_path)
-        
+
         # Schedule the next update
         self.root.after(10, self.update_camera)
-    
-    def confirm_attendance(self, student_name, class_name,unknown_face):
-        
-        if FacialController.match_processed_image(unknown_face):
-            """Method for attendance confirmation window."""
-            self.confirm_window = tk.Toplevel(self.root)
-            self.confirm_window.title("Attendance Confirmation")
-            self.confirm_window.geometry("400x200")
 
-            # Generate current date and time
-            current_time = datetime.datetime.now()
-            formatted_time = current_time.strftime("%Y-%m-%d %H:%M:%S")
+    def confirm_attendance(self, student_name, class_name, face_path):
+        """Match face and confirm attendance."""
+        # Process and match face
+        unknown_face = FacialController.process_image(face_path)
+        is_match = FacialController.match_processed_image(unknown_face)
 
-            # Create confirmation message
+        # Generate current date and time
+        current_time = datetime.now()
+        formatted_time = current_time.strftime("%Y-%m-%d %H:%M:%S")
+
+        if is_match:
             message = (f"Successfully recorded student {student_name} "
                     f"on {formatted_time} for class {class_name}.")
-
-            self.confirmation_label = Label(
-                self.confirm_window,
-                text=message,
-                font=("Helvetica", 12),
-                wraplength=350,
-                justify="center"
-            )
-            self.confirmation_label.pack(pady=20)
-            
-
-            # Close Button for the confirmation window
-            close_button = Button(self.confirm_window, text="Close", command=self.confirm_window.destroy)
-            close_button.pack(pady=10)
         else:
-            print("No match found. Attendance not confirmed.")
-            
+            message = "No match found. Attendance not recorded."
+
+        # Show confirmation message in a new window
+        self.confirm_window = tk.Toplevel(self.root)
+        self.confirm_window.title("Attendance Confirmation")
+        self.confirm_window.geometry("400x200")
+        self.confirmation_label = Label(
+            self.confirm_window, text=message, font=("Helvetica", 12), wraplength=350, justify="center"
+        )
+        self.confirmation_label.pack(pady=20)
+        close_button = Button(self.confirm_window, text="Close", command=self.confirm_window.destroy)
+        close_button.pack(pady=10)
+
 
     def record_attendance(self):
-        """Method to simulate attendance recording and open the confirmation window."""
-        # Simulate getting student name and class name (replace this with real data)
-        student_name = "John Doe"
-        class_name = "CSCI 3366"
+        """Capture image, detect face, and initiate attendance recording."""
+        ret, frame = self.cap.read()
+        if not ret:
+            print("Failed to capture frame from camera.")
+            return
 
-        if self.input_entry.get() != "":
-            student_name = self.input_entry.get()
+        # Face detection
+        gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_frontalface_default.xml")
+        faces = face_cascade.detectMultiScale(gray_frame, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
 
-        # Open the confirmation window
-        threading.Thread(target=self.confirm_attendance, args=(student_name, class_name)).start()
+        if len(faces) == 0:
+            print("No face detected. Please try again.")
+            return
+
+        # Process the first detected face
+        for (x, y, w, h) in faces:
+            face_roi = frame[y:y + h, x:x + w]
+            break  # Only process the first face
+
+        # Save the face ROI
+        now = datetime.now()
+        timestamp = now.strftime("%Y%m%d_%H%M%S")
+        face_path = f'./database/captures/face_{timestamp}.jpg'
+        cv2.imwrite(face_path, face_roi)
+        print(f"Face captured and saved to {face_path}")
+
+        student_name = self.input_entry.get() or "Unknown Student"
+        class_name = self.class_list.get() or "Unknown Class"
+        threading.Thread(target=self.confirm_attendance, args=(student_name, class_name, face_path)).start()
 
 
     def close(self):
