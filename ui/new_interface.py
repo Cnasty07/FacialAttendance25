@@ -95,7 +95,7 @@ class FacialAttendanceSystemApp:
         load_known_faces = FacialController.load_known_faces()
         
         # Compare the unknown face to the known faces
-        is_match = FacialController.match_processed_image([load_known_faces], unknown_face)
+        is_match = FacialController.match_processed_image(unknown_face,load_known_faces)
 
         # Generate current date and time
         current_time = datetime.now()

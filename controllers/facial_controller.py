@@ -29,6 +29,9 @@ class FacialController:
 
     @staticmethod
     def load_known_faces() -> np.ndarray:
+        
+        # FIXME: Need to make it loop through all of the known faces in the student db
+
         # load the known faces from the database that should be the encodings
         load_students = db.StudentTable().read()
         known_faces = load_students['face_encodings'].to_numpy()
