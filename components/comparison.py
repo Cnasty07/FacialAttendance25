@@ -23,18 +23,10 @@ class FacialComparison:
             dict: _description_
         """
         
-        class_data = ClassTable().read(1)
-        known_faces_encodings = {student_id: face_encoding for student_id, face_encoding in class_data}
-        
         # image comparison to see if the image is the same person in database
-        for student_id,student_img_encoding in known_faces_encodings.keys():    
-            result = face_recognition.compare_faces([student_img_encoding], new_img_encodings)
-            if result:
-                found_student = {"student_id": student_id, "result": result}
-                FacialComparison.comparison_accuracy(student_img_encoding,new_img_encodings)
-                return found_student
+        comparison = face_recognition.compare_faces(known_faces_encodings, new_img_encodings)
                 
-        return None
+        return comparison
     
     @staticmethod
     def comparison_accuracy(student_facial_imgs = None,new_img: np.ndarray = None) -> np.linalg.norm :

@@ -23,12 +23,17 @@ class FacialController:
         class_id (int): The class id to be used for the facial recognition system.
         known_faces (dict): The known faces of the class.
     """
-    # def __init__(self, class_id):
+    def __init__(self, class_id: int = None):
     #     self.class_id = class_id
-    #     self.known_faces = self.load_known_faces()
+        self.known_faces = self.load_known_faces()
 
-    def load_known_faces(self):
-        return db.ClassTable().read(self.class_id)
+    @staticmethod
+    def load_known_faces() -> np.ndarray:
+        # load the known faces from the database that should be the encodings
+        load_students = db.StudentTable().read()
+        known_faces = load_students['face_encodings'].to_numpy()
+        print("loading faces: ",type(known_faces))
+        return np.array(known_faces[0])
 
     # starts the process of checking in a student
     def start_new_entry(self, capture_method: str = None):
@@ -53,16 +58,24 @@ class FacialController:
         except Exception as e:
             print("Error: ", e)
             print("Could not capture image. Please try again.")
-        return capture
+        load_face = rec.face_recognition.load_image_file(capture)
+        return load_face
         
     @staticmethod
     # step 2: process image. Gets the face location , encoding, and comparison using recognition module
-    def process_image(self,capture: str = None):
+    def process_image(capture: str = None):
+        """_summary_
+            process the image to get the face encoding.
+        Args:
+            capture (str, optional): _description_. Defaults to None.
+
+        Returns:
+            _type_: _description_
+        """
         try:
             # get the face location and encoding
-            new_face = rec.FacialRecognition(capture)
-            # compare the face to known faces
-            new_face_encoding = new_face.get_face_encoding()
+            new_face_encoding = rec.FacialRecognition().get_face_encoding(capture)
+            print("new face encoding: ",new_face_encoding)
             return new_face_encoding
         except Exception as e:
             print("Error: ", e)
@@ -73,13 +86,9 @@ class FacialController:
     @staticmethod
     def match_processed_image(capture: np.ndarray, known_faces: np.ndarray) -> bool:
         
-        load_students = db.StudentTable().read()
-        known_faces = {load_students['student_id']: load_students['face_encoding']}
-        new_comparison_data = comp.FacialComparison.compare_faces(known_faces,capture)
-        # step 3: return result
-        # print("Match found: ", new_comparison_data.student_id)
+        new_comparison_data = comp.FacialComparison.compare_faces([known_faces],capture)
         
-        return new_comparison_data.result
+        return new_comparison_data
 
     
 

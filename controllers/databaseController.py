@@ -61,6 +61,11 @@ class DatabaseController(ABC):
     def delete(self, *args, **kwargs):
         pass
 
+    def delete_all(self):
+        """Delete all records in the table using pandas."""
+        query = f"DELETE FROM {self.table_name}"
+        self.execute_query(query)
+
 
 class ClassTable(DatabaseController):
     def __init__(self, db_name: str = None): 
@@ -140,11 +145,13 @@ class StudentTable(DatabaseController):
             df = pd.read_sql_query(f"SELECT * FROM {self.table_name} WHERE id = {student_id}", self.conn)
             if not df.empty:
                 df['face_encodings'] = df['face_encodings'].apply(json.loads)
+                pass
             return df
         else:
             df = pd.read_sql_query(f"SELECT * FROM {self.table_name}", self.conn)
             if not df.empty:
                 df['face_encodings'] = df['face_encodings'].apply(json.loads)
+                pass
             return df
 
     def read_all(self):
@@ -165,11 +172,13 @@ class StudentTable(DatabaseController):
         }
         df = pd.DataFrame([data])
         df.to_sql(self.table_name, self.conn, if_exists='replace', index=False, method='multi', chunksize=1000)
+        print(f"Updated student with ID {student_id}")
 
     def delete(self, student_id):
         """Delete a student record using pandas."""
         query = f"DELETE FROM {self.table_name} WHERE id = {student_id}"
         self.execute_query(query)
+        print(f"Deleted student with ID {student_id}")
 
 
 class AttendanceTable(DatabaseController):
