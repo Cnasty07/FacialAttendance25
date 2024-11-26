@@ -1,5 +1,6 @@
 import sys
 import os
+import face_recognition.face_detection_cli
 import numpy as np
 import datetime
 import tkinter as tk
@@ -9,6 +10,7 @@ import cv2
 from PIL import Image, ImageTk
 import threading
 from datetime import datetime
+import face_recognition
 # adding database and facial system to 
 from controllers.databaseController import ClassTable
 from controllers.facial_controller import FacialController
@@ -20,6 +22,7 @@ class FacialAttendanceSystemApp:
         self.root.title("Facial Attendance System")
         self.root.geometry("800x600")
         self.root.configure(background="grey")
+        self.file_path = ""
 
         # Title
         self.title_label = Label(root, text="Facial Attendance System", font=("Helvetica", 20, "bold"))
