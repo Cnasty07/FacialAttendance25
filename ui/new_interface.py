@@ -108,6 +108,28 @@ class FacialAttendanceSystemApp:
             message = "No match found. Attendance not recorded."
 
         # Show confirmation message in a new window
+
+    def confirm_attendance(self, student_name, class_name, face_path):
+        """Match face and confirm attendance."""
+        # Process and match face loads image and gets encoding
+        unknown_face = FacialController.process_image(face_path)
+        # retrieves the known faces from the database
+        load_known_faces = FacialController.load_known_faces()
+        
+        # Compare the unknown face to the known faces
+        is_match = FacialController.match_processed_image([load_known_faces], unknown_face)
+
+        # Generate current date and time
+        current_time = datetime.now()
+        formatted_time = current_time.strftime("%Y-%m-%d %H:%M:%S")
+
+        if is_match[0]:
+            message = (f"Successfully recorded student {student_name} "
+                    f"on {formatted_time} for class {class_name}.")
+        else:
+            message = "No match found. Attendance not recorded."
+
+        # Show confirmation message in a new window
         self.confirm_window = tk.Toplevel(self.root)
         self.confirm_window.title("Attendance Confirmation")
         self.confirm_window.geometry("400x200")
@@ -144,6 +166,36 @@ class FacialAttendanceSystemApp:
         now = datetime.now()
         timestamp = now.strftime("%Y%m%d_%H%M%S")
         face_path = f'./database/captures/face_{timestamp}.jpg'
+        cv2.imwrite(face_path, face_roi)
+        print(f"Face captured and saved to {face_path}")
+
+        student_name = self.input_entry.get() or "Unknown Student"
+        class_name = self.class_list.get() or "Unknown Class"
+        threading.Thread(target=self.confirm_attendance, args=(student_name, class_name, face_path)).start()
+        """Capture image, detect face, and initiate attendance recording."""
+        ret, frame = self.cap.read()
+        if not ret:
+            print("Failed to capture frame from camera.")
+            return
+
+        # Face detection
+        gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_frontalface_default.xml")
+        faces = face_cascade.detectMultiScale(gray_frame, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
+
+        if len(faces) == 0:
+            print("No face detected. Please try again.")
+            return
+
+        # Process the first detected face
+        for (x, y, w, h) in faces:
+            face_roi = frame[y:y + h, x:x + w]
+            break  # Only process the first face
+
+        # Save the face ROI
+        now = datetime.now()
+        timestamp = now.strftime("%Y%m%d_%H%M%S")
+        face_path = f'./database/tests/face_{timestamp}.jpg'
         cv2.imwrite(face_path, face_roi)
         print(f"Face captured and saved to {face_path}")
 
