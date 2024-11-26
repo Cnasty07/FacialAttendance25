@@ -9,7 +9,7 @@ from tkinter import Label, Button
 import cv2
 from PIL import Image, ImageTk
 import threading
-
+from datetime import datetime
 # adding database and facial system to 
 from controllers.databaseController import ClassTable
 from controllers.facial_controller import FacialController
@@ -28,7 +28,7 @@ class FacialAttendanceSystemApp:
         
         try:
             # Class List
-            classes_list = ClassTable("./database/school.db").read_all()
+            classes_list = ClassTable("./database/school.db").read()
             print(classes_list)
         except Exception as e:
             print(f"An error occurred: {e}")
