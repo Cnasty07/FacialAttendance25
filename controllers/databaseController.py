@@ -209,6 +209,22 @@ class AttendanceTable(DatabaseController):
         }
         df = pd.DataFrame(data)
         df.to_sql(self.table_name, self.conn, if_exists='append', index=False)
+        
+    def delete(self, student_id=None, date=None):
+        """Delete attendance records based on student_id or date."""
+        if student_id is None and date is None:
+            raise ValueError("Either student_id or date must be provided to delete records.")
+
+        try:
+            if student_id:
+                self.cursor.execute("DELETE FROM attendance WHERE student_id = ?", (student_id,))
+            if date:
+                self.cursor.execute("DELETE FROM attendance WHERE date = ?", (date,))
+            self.conn.commit()
+        except sqlite3.Error as e:
+            print(f"An error occurred: {e}")
+            self.conn.rollback()
+
 
 
     def filter_by_class(self, class_id):
