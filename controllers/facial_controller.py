@@ -31,7 +31,7 @@ class FacialController:
         student_table = db.StudentTable().read()
         known_faces = student_table.set_index('id')['face_encodings']
         for index, face_encoding in known_faces.items():
-            known_faces.at[index] = np.array(face_encoding)
+            known_faces.at[index] = np.array(face_encoding,dtype=float)
         print(known_faces[known_faces.index == 11])
         print("zero value: ", type(known_faces.values[0]))
         
