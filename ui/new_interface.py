@@ -13,7 +13,7 @@ import threading
 from datetime import datetime
 import face_recognition
 # adding database and facial system to 
-from controllers.databaseController import ClassTable, AttendanceTable
+from controllers.databaseController import ClassTable, AttendanceTable, StudentTable , FaceTable
 from controllers.facial_controller import FacialController
 
 
@@ -192,6 +192,16 @@ class FacialAttendanceSystemApp:
         formatted_time = current_time.strftime("%Y-%m-%d %H:%M:%S")
 
         if is_match[0]:
+            try:
+                Student_table = StudentTable("./database/school.db").read()
+                student_record = Student_table.loc[Student_table['name'] == student_name]
+            except Exception as e:
+                print(f"Student not found:  {e}")
+                student_record = None
+                
+            if student_record:
+                student_id = student_record['id']
+                AttendanceTable("./database/school.db").create(student_id, class_name, formatted_time)
             message = (f"Successfully recorded student {student_name} "
                     f"on {formatted_time} for class {class_name}.")
         else:
@@ -237,6 +247,7 @@ class FacialAttendanceSystemApp:
         cv2.imwrite(face_path, face_roi)
         print(f"Face captured and saved to {face_path}")
 
+        # Get student name and class name from input fields
         student_name = self.input_entry.get() or "Unknown Student"
         class_name = self.class_list.get() or "Unknown Class"
         threading.Thread(target=self.confirm_attendance, args=(student_name, class_name, face_path)).start()

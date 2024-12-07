@@ -29,21 +29,22 @@ class FacialController:
 
     @staticmethod
     def load_known_faces() -> np.ndarray:
+        student_table = db.StudentTable().read()
+        # student_id_faces = student_table.get(['id','face_encodings'])
+        # print(student_id_faces)
         
-        # FIXME: Need to make it loop through all of the known faces in the student db
-
-        # load the known faces from the database that should be the encodings
-        load_students = db.StudentTable().read()
-        # new_dataframe = load_students[['id', 'face_encodings']]
-        # known_faces = {}
-        # for index, row in new_dataframe.iterrows():
-        #     student_id = row['id']
-        #     face_encoding = np.array(row['face_encodings'])
-        #     known_faces[student_id] = face_encoding
+        student_id_faces = student_table.loc[student_table['id'] == 11]
+        print(student_id_faces)
+        
+        known_faces = student_table.set_index('id')['face_encodings'].to_dict()
         # print(known_faces)
-        known_faces = load_students['face_encodings'].to_numpy()
-        print("loading faces: ",type(known_faces))
-        return np.array(known_faces[0])
+        return known_faces
+    
+    
+        # -- old method -- 
+        # known_faces = load_students['face_encodings'].to_numpy()    
+        # print("loading faces: ",type(known_faces))
+        # return np.array(known_faces[0])
 
     # starts the process of checking in a student
     def start_new_entry(self, capture_method: str = None):

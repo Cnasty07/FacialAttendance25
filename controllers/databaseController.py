@@ -68,6 +68,14 @@ class DatabaseController(ABC):
 
 
 class ClassTable(DatabaseController):
+    """_summary_
+
+        Class for managing the 'class' table. Inherits from DatabaseController. 
+        Schema: id, name, room_number, description, start_date, end_date, time
+
+    Args:
+        DatabaseController (_type_): 
+    """
     def __init__(self, db_name: str = None): 
         self.db_name = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../database/school.db')
         super().__init__(db_name)
