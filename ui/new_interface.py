@@ -181,8 +181,10 @@ class FacialAttendanceSystemApp:
         """Match face and confirm attendance."""
         # Process and match face loads image and gets encoding
         unknown_face = FacialController.process_image(face_path)
-        # retrieves the known faces from the database
+        # retrieves the known faces from the database, with id as index
         load_known_faces = FacialController.load_known_faces()
+        known_encodings = load_known_faces.values
+        print(known_encodings)
         
         # Compare the unknown face to the known faces
         is_match = FacialController.match_processed_image(unknown_face, load_known_faces)
@@ -201,6 +203,7 @@ class FacialAttendanceSystemApp:
                 
             if student_record:
                 student_id = student_record['id']
+                print(student_id)
                 AttendanceTable("./database/school.db").create(student_id, class_name, formatted_time)
             message = (f"Successfully recorded student {student_name} "
                     f"on {formatted_time} for class {class_name}.")

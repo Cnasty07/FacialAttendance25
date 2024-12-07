@@ -7,9 +7,8 @@ import components.capture as cap
 import components.comparison as comp
 import components.recognition as rec
 import controllers.databaseController as db
-from PIL import Image,ImageDraw
+import pandas
 
-# TODO: Need to fix some boilerplate code
 
 
 class FacialController:
@@ -28,16 +27,14 @@ class FacialController:
         self.known_faces = self.load_known_faces()
 
     @staticmethod
-    def load_known_faces() -> np.ndarray:
+    def load_known_faces() -> pandas.DataFrame:
         student_table = db.StudentTable().read()
-        # student_id_faces = student_table.get(['id','face_encodings'])
-        # print(student_id_faces)
+        known_faces = student_table.set_index('id')['face_encodings']
+        for index, face_encoding in known_faces.items():
+            known_faces.at[index] = np.array(face_encoding)
+        print(known_faces[known_faces.index == 11])
+        print("zero value: ", type(known_faces.values[0]))
         
-        student_id_faces = student_table.loc[student_table['id'] == 11]
-        print(student_id_faces)
-        
-        known_faces = student_table.set_index('id')['face_encodings'].to_dict()
-        # print(known_faces)
         return known_faces
     
     
@@ -46,7 +43,8 @@ class FacialController:
         # print("loading faces: ",type(known_faces))
         # return np.array(known_faces[0])
 
-    # starts the process of checking in a student
+    # -- not using this method yet -- 
+    # starts the process of checking in a student 
     def start_new_entry(self, capture_method: str = None):
         try :
             # step 1: capture face
