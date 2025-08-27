@@ -2,7 +2,7 @@ import os
 import json
 import numpy as np
 import pandas as pd
-from controllers import facial_controller, databaseController
+from src.controllers import facial_controller, databaseController
 
 class TestFacialSystem:
     def __init__(self):

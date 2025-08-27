@@ -1,14 +1,14 @@
 import os
-import face_recognition
 import dlib
 import numpy as np
-import pandas as pd
-import components.capture as cap
-import components.comparison as comp
-import components.recognition as rec
-import controllers.databaseController as db
 import pandas
 
+import src.components.capture as cap
+import src.components.comparison as comp
+import src.components.recognition as rec
+import src.controllers.databaseController as db
+
+from typing import Optional
 
 
 class FacialController:
@@ -22,7 +22,7 @@ class FacialController:
         class_id (int): The class id to be used for the facial recognition system.
         known_faces (dict): The known faces of the class.
     """
-    def __init__(self, class_id: int = None):
+    def __init__(self, class_id: Optional[int] = None):
     #     self.class_id = class_id
         # self.known_faces = self.load_known_faces()
         pass
@@ -37,16 +37,10 @@ class FacialController:
         print("zero value: ", type(known_faces.values[0]))
         
         return known_faces
-    
-    
-        # -- old method -- 
-        # known_faces = load_students['face_encodings'].to_numpy()    
-        # print("loading faces: ",type(known_faces))
-        # return np.array(known_faces[0])
 
     # -- not using this method yet -- 
     # starts the process of checking in a student 
-    def start_new_entry(self, capture_method: str = None):
+    def start_new_entry(self, capture_method: Optional[str] = None):
         try :
             # step 1: capture face
             capture = self.capture_entry(capture_method)
@@ -62,7 +56,7 @@ class FacialController:
 
     @staticmethod
     # step 1: capture face
-    def capture_entry(capture_method: str = None) -> np.ndarray:
+    def capture_entry(capture_method: Optional[str] = None) -> np.ndarray:
         try:
             capture = cap.Capture(capture_method)
         except Exception as e:
@@ -73,7 +67,7 @@ class FacialController:
         
     @staticmethod
     # step 2: process image. Gets the face location , encoding, and comparison using recognition module
-    def process_image(capture: str = None) -> np.ndarray:
+    def process_image(capture: Optional[str] = None) -> np.ndarray:
         """_summary_
             process the image to get the face encoding.
         Args:
@@ -101,7 +95,6 @@ class FacialController:
         
         return new_comparison_data
 
-    
 
 
 def main():
@@ -111,8 +104,6 @@ def main():
         print("Using CUDA for dlib.")
     else:
         print("CUDA is not available for dlib.")
-    
-
 
 
 if __name__ == "__main__":

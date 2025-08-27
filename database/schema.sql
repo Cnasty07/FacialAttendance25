@@ -1,3 +1,6 @@
+-- Schema for SQL Relational Databases -- 
+
+-- Class table for each class.
 CREATE TABLE class (
     class_id INT PRIMARY KEY,
     class_name VARCHAR(100) NOT NULL,
@@ -8,6 +11,7 @@ CREATE TABLE class (
     class_time TIME
 );
 
+-- Student table used for individual student. used to specify 
 CREATE TABLE student (
     student_id INT PRIMARY KEY, -- Student ID
     student_name VARCHAR(100) NOT NULL, -- Full name
@@ -16,6 +20,7 @@ CREATE TABLE student (
     FOREIGN KEY (student_classes) REFERENCES class(class_id) -- Foreign key to class table
 );
 
+-- Attendance table for the class and student
 CREATE TABLE attendance (
     attendance_id INT PRIMARY KEY,
     class_id INT,
@@ -26,6 +31,7 @@ CREATE TABLE attendance (
     FOREIGN KEY (student_id) REFERENCES student(student_id)
 );
 
+-- face table for student. Saves encoding for face relational to student_id
 CREATE TABLE face (
     face_id INT PRIMARY KEY,
     student_id INT,

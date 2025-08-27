@@ -6,8 +6,8 @@ from PIL import Image, ImageDraw
 
 #main code 
 class FacialRecognition:
-    # def __init__(self, img_path: str = None):
-    #     self.img_path = img_path
+    def __init__(self, img_path: str = None):
+        self.img_path = img_path
     #     # self.img_face_encoding = self.get_face_encoding()
     
     @staticmethod
@@ -31,10 +31,11 @@ class FacialRecognition:
         return img
 
     @staticmethod
-    def get_face_encoding(img_path: str = None):
-        img = FacialRecognition().load_image_file(img_path)
-        if img is None:
-            print("Image not found")
+    def get_face_encoding(img_path: str):
+        try:
+            img = FacialRecognition().load_image_file(img_path)
+        except Exception as e:
+            print(f"Error loading image: {e}")
             exit()
         img_encoding = face_recognition.face_encodings(img)[0]
         return img_encoding

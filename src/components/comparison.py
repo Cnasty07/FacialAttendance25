@@ -4,7 +4,7 @@ import dlib
 import numpy as np
 import pandas as pd
 
-from controllers.databaseController import ClassTable
+from src.controllers.databaseController import ClassTable
 
 print(os.path.dirname(os.path.relpath(__file__)))
 

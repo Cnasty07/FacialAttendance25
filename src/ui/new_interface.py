@@ -1,6 +1,4 @@
-import os
 import math
-import numpy as np
 import pandas as pd
 import datetime
 import tkinter as tk
@@ -10,9 +8,12 @@ import cv2
 from PIL import Image, ImageTk
 import threading
 from datetime import datetime
-# adding database and facial system to 
-from controllers.databaseController import ClassTable, AttendanceTable, StudentTable , FaceTable
-from controllers.facial_controller import FacialController
+
+import sys
+
+
+from src.controllers.databaseController import ClassTable, AttendanceTable, StudentTable , FaceTable
+from src.controllers.facial_controller import FacialController
 
 
 class FacialAttendanceSystemApp:
@@ -29,7 +30,7 @@ class FacialAttendanceSystemApp:
         
         try:
             # Class List
-            classes_list = ClassTable("./database/school.db").read()
+            classes_list = ClassTable(sys.path[0] + "/database/school.db").read()
             print(classes_list)
         except Exception as e:
             print(f"An error occurred: {e}")

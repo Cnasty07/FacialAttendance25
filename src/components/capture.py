@@ -28,13 +28,13 @@ class Capture:
         if capture_method == 'video':
             self.start_video_capture()
         elif capture_method == 'image':
-            self.start_image_capture()
+            self.Capture.start_image_capture()
         # used for testing
         elif capture_method == 'stored':
-             self.start_return_image()
+            self.start_return_image()
     
     @staticmethod
-    def start_video_capture(self) -> np.ndarray:
+    def start_video_capture() -> np.ndarray:
         cap = cv2.VideoCapture(0)
         
         if not cap.isOpened():
@@ -100,7 +100,7 @@ class Capture:
         return face_recognition.load_image_file(file_path)
 
     @staticmethod
-    def start_return_image(self):
+    def start_return_image() -> np.ndarray:
         return face_recognition.load_image_file('../../database/tests/Musk3.jpg')
 
 def main():

@@ -3,7 +3,9 @@ import json
 from abc import ABC, abstractmethod
 import os
 import pandas as pd
-
+import sys
+from typing import Optional , LiteralString
+from sqlite3 import Connection, Cursor
 
 # TODO: Change the face encoding to a numpy array
 # TODO: Add a method to convert the numpy array to a string for storage in the database
@@ -11,14 +13,15 @@ import pandas as pd
 
 
 class DatabaseController(ABC):
-    def __init__(self, db_name: str = None):
+    def __init__(self, db_name: Optional[str] = None):
         if db_name is None:
-            db_name = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../database/school.db')
+            db_name = sys.path[0] + '/database/school.db'
+            print(db_name)
         else :
             self.db_name = db_name
         self.table_name = None
-        self.conn = None
-        self.cursor = None
+        self.conn: Connection
+        self.cursor: Cursor
         self.schema = None
 
     # connects to the database
@@ -77,9 +80,12 @@ class ClassTable(DatabaseController):
     Args:
         DatabaseController (_type_): 
     """
-    def __init__(self, db_name: str = None): 
-        self.db_name = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../database/school.db')
-        super().__init__(db_name)
+    def __init__(self, db_name: Optional[str] = None):
+        # print(db_name)
+        if db_name is not None:
+            self.db_name = db_name
+        else:
+            super().__init__(db_name)
         self.table_name = 'class'
         self.connect()
         self.schema = {
@@ -129,9 +135,11 @@ class ClassTable(DatabaseController):
     
 class StudentTable(DatabaseController):
     """Class for managing the 'student' table."""
-    def __init__(self, db_name: str = None):
-        self.db_name = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../database/school.db')
-        super().__init__(db_name)
+    def __init__(self, db_name: Optional[str] = None):
+        if db_name is not None:
+            self.db_name = db_name
+        else:
+            super().__init__(db_name)
         self.table_name = 'student'
         self.connect()
         self.schema = {
@@ -196,9 +204,11 @@ class StudentTable(DatabaseController):
 
 class AttendanceTable(DatabaseController):
     """Class for managing the 'attendance' table."""
-    def __init__(self, db_name:str = None):
-        self.db_name = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../database/school.db')
-        super().__init__(db_name)
+    def __init__(self, db_name: Optional[str] = None):
+        if db_name is not None:
+            self.db_name = db_name
+        else:
+            super().__init__(db_name)
         self.table_name = 'attendance'
         self.connect()
         self.schema = {
@@ -262,9 +272,11 @@ class AttendanceTable(DatabaseController):
 
 class FaceTable(DatabaseController):
     """Class for managing the 'face' table."""
-    def __init__(self, db_name: str = None):
-        self.db_name = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../database/school.db')
-        super().__init__(db_name)
+    def __init__(self, db_name: Optional[str] = None):
+        if db_name is not None:
+            self.db_name = db_name
+        else:
+            super().__init__(db_name)
         self.table_name = 'face'
         self.connect()
         data = {
@@ -318,7 +330,8 @@ class FaceTable(DatabaseController):
 
 
 def main():
-    db_name = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../database/school.db')
+    sys.path.append(os.path.join(os.path.dirname(__file__), '../..'))
+    db_name = sys.path[0] + '/database/school.db'
     # Example usage
     class_table = ClassTable(db_name)
     class_table.create('Math 101', 101, 'Introduction to Mathematics', '2022-01-01', '2022-05-01', '09:00:00')

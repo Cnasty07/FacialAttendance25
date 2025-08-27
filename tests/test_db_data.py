@@ -1,7 +1,7 @@
 import os 
 import numpy as np
 import pandas as pd
-from controllers import facial_controller , databaseController
+from src.controllers import facial_controller , databaseController
 from abc import ABC, abstractmethod
 #main code 
 class DatabaseFiller(ABC):
@@ -100,32 +100,13 @@ class AttendanceTest(DatabaseFiller):
         print(self.attendance_table.read())
 
 
- 
-
-    
-
-
-def main() -> None:
-    
+def main() -> None:    
     # class table filler data
     class_table = ClassTest()
     class_table.fill_table()
     # class_table.update_table()
     print(class_table.read_table())
-    
-    # student table filler data
-    # need to run these two together
-    # test_db_ruben = StudentTest()
-    # test_db_ruben.test_database()
-    # student = StudentTest()
-    # student.fill_table()
-    # student.read_table()
-    
-    # attendance table filler data
-    # attendance = AttendanceTest()
-    # attendance.fill_table()
-    
-    
+
 
 if __name__ == '__main__':
     main()
