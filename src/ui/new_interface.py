@@ -93,7 +93,7 @@ class FacialAttendanceSystemApp:
         self.running = True
         self.update_camera()
 
-    def search_student(self):
+    def search_student(self) -> None:
         """Query attendance records by student name."""
         student_name = self.search_entry.get()
         if not student_name:
@@ -113,7 +113,7 @@ class FacialAttendanceSystemApp:
         except Exception as e:
             messagebox.showerror("Error", f"An error occurred: {e}")
 
-    def search_date(self):
+    def search_date(self) -> None:
         """Query attendance records by date."""
         date = self.search_entry.get()
         if not date:
@@ -128,7 +128,7 @@ class FacialAttendanceSystemApp:
         except Exception as e:
             messagebox.showerror("Error", f"An error occurred: {e}")
 
-    def display_results(self, records):
+    def display_results(self, records) -> None:
         """Display the queried records in a popup window."""
         if records.empty:
             messagebox.showinfo("No Results", "No records found for the given query.")
@@ -159,7 +159,7 @@ class FacialAttendanceSystemApp:
         self.running = True
         self.update_camera()
 
-    def update_camera(self):
+    def update_camera(self) -> None:
         """Update the camera feed in the GUI with optional face detection."""
         if not self.running:
             return
@@ -176,7 +176,7 @@ class FacialAttendanceSystemApp:
         # Schedule the next update
         self.root.after(10, self.update_camera)
 
-    def confirm_attendance(self, student_name, class_name, face_path):
+    def confirm_attendance(self, student_name, class_name, face_path) -> None:
         """Match face and confirm attendance."""
         
         try:
@@ -244,7 +244,7 @@ class FacialAttendanceSystemApp:
         close_button.pack(pady=10)
 
 
-    def record_attendance(self):
+    def record_attendance(self) -> None:
         """Capture image, detect face, and initiate attendance recording."""
         ret, frame = self.cap.read()
         if not ret:
@@ -278,7 +278,7 @@ class FacialAttendanceSystemApp:
         threading.Thread(target=self.confirm_attendance, args=(student_name, class_name, face_path)).start()
 
 
-    def close(self):
+    def close(self) -> None:
         """Clean up resources when the application is closed."""
         self.running = False
         self.cap.release()

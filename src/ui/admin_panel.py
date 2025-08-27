@@ -4,6 +4,7 @@ import src.controllers.databaseController as db
 import pandas as pd
 
 ## TODO: Implement Admin Panel functionality
+
 class AdminPanel():
     def __init__(self,root) -> None:
         self.root = root
@@ -27,8 +28,8 @@ class AdminPanel():
 
     def view_reports(self) -> None:
         pass
-    
-    def close(self):
+
+    def close(self) -> None:
         """Clean up resources when the application is closed."""
         self.root.destroy()
 

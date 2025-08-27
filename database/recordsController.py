@@ -2,6 +2,7 @@ import sqlite3
 import json
 from abc import ABC, abstractmethod
 
+## INFO: This is an abstract base class for database controllers. Primarily used for testing.
 
 class DatabaseController(ABC):
     def __init__(self, db_name):

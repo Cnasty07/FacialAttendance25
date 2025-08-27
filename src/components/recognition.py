@@ -3,6 +3,7 @@ import cv2 as cv
 import face_recognition
 import dlib
 from PIL import Image, ImageDraw
+import numpy as np
 
 #main code 
 class FacialRecognition:
@@ -11,7 +12,7 @@ class FacialRecognition:
     #     # self.img_face_encoding = self.get_face_encoding()
     
     @staticmethod
-    def find_face(self):
+    def find_face(self) -> list:
         """_summary_
             This function finds the face in the image
         Returns:
@@ -21,7 +22,7 @@ class FacialRecognition:
         return find_face_in
     
     @staticmethod
-    def load_image_file(img_path):
+    def load_image_file(img_path) -> np.ndarray:
         """_summary_
             This function loads the image file
         Returns:
@@ -31,7 +32,7 @@ class FacialRecognition:
         return img
 
     @staticmethod
-    def get_face_encoding(img_path: str):
+    def get_face_encoding(img_path: str) -> np.ndarray:
         try:
             img = FacialRecognition().load_image_file(img_path)
         except Exception as e:
@@ -41,19 +42,19 @@ class FacialRecognition:
         return img_encoding
     
     @staticmethod
-    def show_faces(self):
+    def show_faces(self) -> None:
         # ideally only one face when checking in.
        pil_image = Image.fromarray(self.img_path)
        d = ImageDraw.Draw(pil_image)
        d.rectangle(self.get_face_features)
        d.text((10, 10), "Is This you?", fill=(255, 255, 255))
-       
-    def get_face_features(self):
+
+    def get_face_features(self) -> dict:
         face_features = face_recognition.face_landmarks(self.img_path)
         return face_features
 
 
-def main():
+def main() -> None:
     new_face = FacialRecognition()
     new_face.img_path = "path_to_image"
 

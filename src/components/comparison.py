@@ -36,9 +36,9 @@ class FacialComparison:
         # accuracy of prediction
         face_distance = face_recognition.face_distance([student_facial_imgs], new_img)
         return face_distance
-    
-    
-def main():
+
+
+def main() -> None:
     os.add_dll_directory(os.environ['CUDA_PATH'])
     dlib.DLIB_USE_CUDA = True
     if dlib.DLIB_USE_CUDA:
@@ -49,4 +49,4 @@ def main():
     new_comparison.compare_faces()
 
 if __name__ == '__main__':
-    main() 
+    main()

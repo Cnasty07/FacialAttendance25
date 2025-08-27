@@ -25,7 +25,7 @@ class DatabaseController(ABC):
         self.schema = None
 
     # connects to the database
-    def connect(self):
+    def connect(self) -> None:
         try:
             self.conn = sqlite3.connect(self.db_name)
             self.cursor = self.conn.cursor()
@@ -33,12 +33,12 @@ class DatabaseController(ABC):
             print(f"Failed to connect to the database: {e}")
 
     # closes the connection to the database
-    def close(self):
+    def close(self) -> None:
         if self.conn:
             self.conn.close()
 
     # mainly used for delete query
-    def execute_query(self, query, params=()):
+    def execute_query(self, query, params=()) -> None:
         try:
             self.cursor.execute(query, params)
             self.conn.commit()
@@ -65,7 +65,7 @@ class DatabaseController(ABC):
     def delete(self, *args, **kwargs):
         pass
 
-    def delete_all(self):
+    def delete_all(self) -> None:
         """Delete all records in the table using pandas."""
         query = f"DELETE FROM {self.table_name}"
         self.execute_query(query)
