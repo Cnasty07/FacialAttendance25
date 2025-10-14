@@ -1,3 +1,9 @@
+## TODO: To properly setup the project, you have to rebuild the wheel and upgrade setuptools using the following commands:
+# 1. pip install wheel setuptools pip --upgrade
+# 2. pip install git+https://github.com/ageitgey/face_recognition_models --verbose
+
+# FIX: currently not yet implemente above commands.
+
 from setuptools import setup, find_packages
 
 setup(

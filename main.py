@@ -1,8 +1,8 @@
 import os 
 import sys
 import cv2
-import dlib
 import face_recognition
+import dlib
 import tkinter as tk
 
 from src import ui
@@ -19,6 +19,7 @@ def activate(root):
     try:
         os.add_dll_directory(os.environ['CUDA_PATH'])
         dlib.DLIB_USE_CUDA = True
+        print("Cuda detected. Using GPU acceleration.")
     except Exception as e:
         print("Cuda not detected. Defaulting to cpu.", e)
 
