@@ -1,6 +1,7 @@
 # Facial Recognition Attendance System
 
-- by Chris Nastasi & Ruben Reyes
+- by Chris Nastasi, Nicholas Hernandez, Ian Arredondo
+- previous contributor: Ruben Reyes
 
 ## Description
 
@@ -17,10 +18,6 @@ A Python-based facial recognition system for managing and recording student atte
 - **User Interface**: Interactive GUI for capturing images and confirming attendance.
 - **Modular Architecture**: Organized codebase with separate modules for components and controllers.
 - **Unit Testing**: Ensures code reliability with comprehensive tests.
-
-### Database Structure
-
-DATABASE SYSTEMS PROJECT
 
 ### Schema
 
