@@ -7,6 +7,20 @@
 
 This project aims to create a facial attendance system that detects unique faces and updates attendance values in the database for specific classes and specific students.
 
+## To Run
+
+Please install the dependencies provided using:
+
+```{bash}
+pipenv shell
+```
+
+And then use the command:
+
+```{bash}
+pipenv run python main.py
+```
+
 ## Overview
 
 A Python-based facial recognition system for managing and recording student attendance. It utilizes machine learning for face detection and recognition, integrated with a SQLite database for data management, and provides a user-friendly GUI built with Tkinter.
