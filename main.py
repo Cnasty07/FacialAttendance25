@@ -23,19 +23,23 @@ def activate(root):
     except Exception as e:
         print("Cuda not detected. Defaulting to cpu.", e)
 
-    # Starts the interface
+    # Starts the interface: CLI input required at the moment to choose admin or user
     user_type = input("Enter user type (admin/user): ").strip().lower()
+
+    # Option 1: Admin Panel
     if user_type == "admin":
         admin_panel = ui.admin_panel.AdminPanel(root)
         root.protocol("WM_DELETE_WINDOW", admin_panel.close)
         root.mainloop()
+        
+    # Option 2: User Facial Attendance Panel
     elif user_type == "user":
         check_in = ui.new_interface.FacialAttendanceSystemApp(root)
         root.protocol("WM_DELETE_WINDOW", check_in.close)
         root.mainloop()
     else:
         print("Invalid user type. Exiting.")
-        return
+        return None
 
 
 def deactivate():

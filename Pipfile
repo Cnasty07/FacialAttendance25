@@ -5,11 +5,11 @@ name = "pypi"
 
 [packages]
 facialattendance = {file = "."}
-cmake = "*"
-face-recognition = "*"
 opencv-python = "*"
 dlib = "*"
 pytest = "*"
+cmake = "*"
+face-recognition = "*"
 
 [dev-packages]
 
