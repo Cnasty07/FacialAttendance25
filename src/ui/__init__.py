@@ -1,4 +1,4 @@
 # src/ui/__init__.py
-from . import new_interface , admin_panel
+from . import new_interface , admin_panel , choose_user_panel
 
-__all__ = ['new_interface', 'admin_panel']
+__all__ = ['new_interface', 'admin_panel', 'choose_user_panel']

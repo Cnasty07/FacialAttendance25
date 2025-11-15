@@ -10,6 +10,7 @@ dlib = "*"
 pytest = "*"
 cmake = "*"
 face-recognition = "*"
+pymongo = {extras = ["srv"], version = "*"}
 
 [dev-packages]
 

@@ -1,21 +1,26 @@
+import sys
 import math
-import pandas as pd
+import threading
 import datetime
+from datetime import datetime
+
 import tkinter as tk
 from tkinter import ttk
 from tkinter import Label, Button, messagebox
+
+import pandas as pd
 import cv2
 from PIL import Image, ImageTk
-import threading
-from datetime import datetime
-
-import sys
 
 
+# Local Imports
 from src.controllers.databaseController import ClassTable, AttendanceTable, StudentTable , FaceTable
 from src.controllers.facial_controller import FacialController
 
+# TODO: Refactor this into a proper Tkinter Frame for better integration with AppController
+# TODO: Change database calls to MongoDB later on.
 
+# --- Facial Attendance Student View ---
 class FacialAttendanceSystemApp:
     def __init__(self, root):
         self.root = root
@@ -128,6 +133,7 @@ class FacialAttendanceSystemApp:
         except Exception as e:
             messagebox.showerror("Error", f"An error occurred: {e}")
 
+    # Display Results in Popup
     def display_results(self, records) -> None:
         """Display the queried records in a popup window."""
         if records.empty:
