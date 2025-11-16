@@ -11,6 +11,7 @@ pytest = "*"
 cmake = "*"
 face-recognition = "*"
 pymongo = {extras = ["srv"], version = "*"}
+pydantic = "*"
 
 [dev-packages]
 

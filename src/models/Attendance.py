@@ -1,16 +1,21 @@
 import datetime
-from dataclasses import dataclass, field
 import bson
 
+from pydantic import BaseModel, Field, ConfigDict
+from pydantic.types import StrictBool
 
-
-@dataclass(init=True, repr=True)
-class Attendance:
+class Attendance(BaseModel):
     attendance_id: bson.ObjectId
-    student_id: bson.ObjectId
+    student_id: bson.ObjectId 
     class_id: bson.ObjectId
-    attendance_date: datetime.datetime
-    attendance_status: bool
+    attendance_date: datetime.time = Field(description="Date and time of the attendance record")
+    attendance_status: StrictBool = Field(description="True if present, False if absent")
+
+    model_config = ConfigDict({
+        "arbitrary_types_allowed": True,
+        "extra": "forbid",
+        "validate_assignment": True,
+    })
 
 
 def main():
@@ -18,10 +23,12 @@ def main():
         attendance_id=bson.ObjectId(),
         student_id=bson.ObjectId(),
         class_id=bson.ObjectId(),
-        attendance_date=datetime.datetime.now(),
+        attendance_date=datetime.datetime.now().time(),
         attendance_status=True
     )
-    print(attendance_instance.__repr__())
+    print(attendance_instance)
+
+    
 
 if __name__ == "__main__":
     main()

@@ -19,6 +19,7 @@ classDiagram
     User : +String email
     User : +Array enrolled_classes
     User : +Array face_data
+    User : +Array attendance_record
 
     class Classes
     Classes : +String name

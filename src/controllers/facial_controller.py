@@ -54,8 +54,8 @@ class FacialController:
 
         return "Check in complete."
 
+    # Step 1: capture face
     @staticmethod
-    # step 1: capture face
     def capture_entry(capture_method: Optional[str] = None) -> np.ndarray:
         try:
             capture = cap.Capture(capture_method)
@@ -65,8 +65,8 @@ class FacialController:
         load_face = rec.face_recognition.load_image_file(capture)
         return load_face
         
+    # Step 2: process image. Gets the face location , encoding, and comparison using recognition module
     @staticmethod
-    # step 2: process image. Gets the face location , encoding, and comparison using recognition module
     def process_image(capture: Optional[str] = None) -> np.ndarray:
         """_summary_
             process the image to get the face encoding.

@@ -4,6 +4,9 @@ import face_recognition
 from datetime import datetime
 import numpy as np
 
+
+# -- Capture Class --
+# Summary: This class handles video and image capture using OpenCV.
 class Capture:
     """
     Summary:
@@ -23,90 +26,85 @@ class Capture:
         start_return_image():
             Returns a stored image for testing purposes.
     """
-    
-    def __init__(self,capture_method: str):
+
+    def __init__(self, capture_method: str):
         if capture_method == 'video':
             self.start_video_capture()
         elif capture_method == 'image':
-            self.Capture.start_image_capture()
+            self.start_image_capture()
         # used for testing
         elif capture_method == 'stored':
             self.start_return_image()
-    
+
     @staticmethod
     def start_video_capture() -> np.ndarray:
         cap = cv2.VideoCapture(0)
-        
+
         if not cap.isOpened():
             print("Error: Could not open video capture.")
             return
-        
+
         while True:
             ret, frame = cap.read()
             if not ret:
                 print("Error: Could not read frame.")
                 break
-            
+
             cv2.imshow('Video Capture', frame)
-            
+
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
-            
-             # Get the current date and time
-        now = datetime.now()
-        # Format the date and time to include in the file path
-        timestamp = now.strftime("%Y%m%d_%H%M%S")
-        # Save the captured image to the specified path with the timestamp
-        file_path = f'./database/captures/captured_image_{timestamp}.jpg'
-        # Save the captured image to the specified path
-        cv2.imwrite(file_path, frame)
-        
+
+        now = datetime.now() # Get the current date and time
+
+        timestamp = now.strftime("%Y%m%d_%H%M%S") # Format the date and time to include in the file path
+
+        file_path = f'./database/captures/captured_image_{timestamp}.jpg' # Save the captured image to the specified path with the timestamp
+
+        cv2.imwrite(file_path, frame) # Save the captured image to the specified path
+
         cap.release()
         cv2.destroyAllWindows()
-        
+
         # not sure if this method works on videos yet
         return face_recognition.load_image_file(frame)
-    
+
     @staticmethod
     def start_image_capture() -> np.ndarray:
         cap = cv2.VideoCapture(0)
-        
+
         if not cap.isOpened():
             print("Error: Could not open video capture.")
             return
-        
+
         ret, frame = cap.read()
         if not ret:
             print("Error: Could not read frame.")
             cap.release()
             return
-        
+
         cv2.imshow('Image Capture', frame)
-        
-        # Get the current date and time
-        now = datetime.now()
-        # Format the date and time to include in the file path
-        timestamp = now.strftime("%Y%m%d_%H%M%S")
-        # Save the captured image to the specified path with the timestamp
-        file_path = f'./database/captures/captured_image_{timestamp}.jpg'
-        # Save the captured image to the specified path
-        cv2.imwrite(file_path, frame)
-        
-        
+
+        now = datetime.now() ### Get the current date and time
+        timestamp = now.strftime("%Y%m%d_%H%M%S") ### Format the date and time to include in the file path
+        file_path = f'./database/captures/captured_image_{timestamp}.jpg' ### Save the captured image to the specified path with the timestamp
+        cv2.imwrite(file_path, frame) ### Save the captured image to the specified path
+
         cv2.waitKey(0)
         cap.release()
         cv2.destroyAllWindows()
-        
+
         return face_recognition.load_image_file(file_path)
 
     @staticmethod
     def start_return_image() -> np.ndarray:
         return face_recognition.load_image_file('../../database/tests/Musk3.jpg')
 
+
 def main():
     capture = Capture('stored')
     print(capture)
-    
+
 
 if __name__ == '__main__':
-    main() 
+    main()

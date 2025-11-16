@@ -1,16 +1,18 @@
 import os 
 import sys
-import cv2
-import face_recognition
 import dlib
 import tkinter as tk
 
 from src import ui
 
+# getting ready to remove these as not needed here
+# import cv2 
+# import face_recognition
 
 # TODO: Finish Entry to application
 
 
+# -- Application Activation Function --
 def activate(root: tk.Tk) -> None:
     """_summary_
     starts the facial recognition system.
@@ -63,11 +65,15 @@ def activate(root: tk.Tk) -> None:
     change_window(user_type)
     root.mainloop()
 
+# -- END Application Activation Function --
+
+
 # Terminates the application (will probably delete later as it serves limited use now).
 def deactivate():
     sys.exit()
 
 
+# Entry Point
 def main() -> None:
     sys.path.append(os.getcwd())
     print("Current working directory: ", sys.path[0])

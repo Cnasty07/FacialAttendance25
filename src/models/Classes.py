@@ -1,37 +1,37 @@
 import os
 import datetime
-from dataclasses import dataclass , field
 import bson
 
+from pydantic import Field , BaseModel, ConfigDict
+from pydantic.dataclasses import dataclass
+from pydantic.types import  StrictInt, StrictStr, AwareDatetime
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 
-@dataclass(init=True, repr=True)
-class Class:
-    name: str
-    course_code: int
+# @dataclass(init=True, repr=True)
+class Classes(BaseModel):
+    name: StrictStr = Field(description="Name of the class/course", min_length=1)
+    course_code: StrictInt = Field(description="Numeric course code", ge=1)
     roster: list[bson.ObjectId]
-    start_time: datetime.time | None = field(default=None)
-    end_time: datetime.time | None = field(default=None)
+    start_time: datetime.time
+    end_time: datetime.time
+
+    model_config = ConfigDict({
+        "arbitrary_types_allowed": True,
+        "extra": "forbid",
+        "validate_assignment": True,
+    })
 
 
 def main():
-    class_instance = Class(
+    class_instance = Classes(
         name="Introduction to Programming",
         course_code=102,
         roster=[],
-        # start_time=datetime.datetime(2025,8,25,9,0).time(),
-        # class_end_time=datetime.datetime(2025,12,12,10,30).time()
+        start_time=datetime.time(9, 0),
+        end_time=datetime.time(10, 30)
     )
     print(class_instance.__repr__())
-
-    # Testing adding Class
-    client = MongoClient(host=os.getenv("MONGO_URI"), server_api=ServerApi("1"),connect=True)
-    client_db = client["EmbeddedAppData"]
-    class_collection = client_db["Classes"]
-    for classes in class_collection.find().sort("course_code", 1):
-        print(classes)
-    
 
 if __name__ == "__main__":
     main()

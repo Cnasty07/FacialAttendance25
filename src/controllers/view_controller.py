@@ -45,8 +45,4 @@ class AppController(tk.Tk):
             except Exception as e:
                 print(f"Error in on_show for {cont}: {e}")
 
-def main():
-    pass
 
-if __name__ == '__main__':
-    main()

@@ -5,9 +5,10 @@ import dlib
 from PIL import Image, ImageDraw
 import numpy as np
 
-#main code 
+# -- Facial Recognition Class --
+# INFO: This class handles facial recognition tasks using the face_recognition library.
 class FacialRecognition:
-    def __init__(self, img_path: str = None):
+    def __init__(self, img_path: str | None = None):
         self.img_path = img_path
     #     # self.img_face_encoding = self.get_face_encoding()
     
@@ -53,7 +54,10 @@ class FacialRecognition:
         face_features = face_recognition.face_landmarks(self.img_path)
         return face_features
 
+# -- END Facial Recognition Class --
 
+
+# Testing Purposes
 def main() -> None:
     new_face = FacialRecognition()
     new_face.img_path = "path_to_image"
