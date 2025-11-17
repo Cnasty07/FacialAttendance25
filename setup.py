@@ -21,6 +21,8 @@ setup(
         'setuptools',
         'pydantic',
         'pymongo[srv]',
+        'pymongoose',
+        
         
     ],
     entry_points={

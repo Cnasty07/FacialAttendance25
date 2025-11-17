@@ -1,8 +1,7 @@
 import os 
 import sys
-import dlib
 
-
+from utils import gpu_detection
 from src.controllers.view_controller import AppController
 
 # TODO: Finish Entry to application
@@ -15,19 +14,10 @@ def activate(app) -> None:
     """_summary_
     starts the facial recognition system.
     """
-    
-    # adds the CUDA path to the system path and sets dlib to use CUDA
-    try:
-        os.add_dll_directory(os.environ['CUDA_PATH'])
-        dlib.DLIB_USE_CUDA = True
-        print("Cuda detected. Using GPU acceleration.")
-    except Exception as e:
-        print("Cuda not detected. Defaulting to cpu.", e)
+    gpu_detection.is_gpu_available() # Check for GPU availability
 
 
-
-
-    ## INFO: Using this with app controller to manage frames in later fix.
+    ## -- Setup Main Application Window --
     app.geometry("800x600")
     app.title("Facial Attendance System")
     app.show_frame("ChooseUserPanel")
@@ -35,7 +25,8 @@ def activate(app) -> None:
     
     ## Start GUI loop
     app.mainloop()
-
+    ## -- END Setup Main Application Window --
+    
 # -- END Application Activation Function --
 
 
@@ -44,11 +35,10 @@ def deactivate() -> None:
     sys.exit()
 
 
-# Entry Point
+# Entry Point For Application
 def main() -> None:
     
-    ## Ensure current working directory is in sys.path for module resolution.
-    sys.path.append(os.getcwd())
+    sys.path.append(os.getcwd()) # Ensure current working directory is in sys.path for module resolution.
     print("Current working directory: ", sys.path[0])
     
     ## Starts the application controller for frame switching and user interface management.

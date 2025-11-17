@@ -1,12 +1,17 @@
 import datetime
 import bson
 
-from pydantic import BaseModel, Field, ConfigDict
+from pydantic import BaseModel, Field, ConfigDict , BeforeValidator
 from pydantic.types import StrictBool
+from typing import Annotated , Optional
 
-class Attendance(BaseModel):
-    attendance_id: bson.ObjectId
-    student_id: bson.ObjectId 
+PyObjectId = Annotated[str, BeforeValidator(str)]
+
+# TODO: Implement this when everything else is done.
+
+class AttendanceModel(BaseModel):
+    id: Optional[PyObjectId] = Field(alias="_id", default=None)
+    student_id: bson.ObjectId
     class_id: bson.ObjectId
     attendance_date: datetime.time = Field(description="Date and time of the attendance record")
     attendance_status: StrictBool = Field(description="True if present, False if absent")
@@ -19,16 +24,8 @@ class Attendance(BaseModel):
 
 
 def main():
-    attendance_instance = Attendance(
-        attendance_id=bson.ObjectId(),
-        student_id=bson.ObjectId(),
-        class_id=bson.ObjectId(),
-        attendance_date=datetime.datetime.now().time(),
-        attendance_status=True
-    )
-    print(attendance_instance)
+    pass
 
-    
 
 if __name__ == "__main__":
     main()

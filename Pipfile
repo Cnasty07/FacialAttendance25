@@ -14,6 +14,9 @@ face-recognition-models = {git = "https://github.com/ageitgey/face_recognition_m
 setuptools = "*"
 opencv-python = "*"
 pymongo = {extras = ["srv"], version = "*"}
+pandas = "*"
+pyarrow = "*"
+pymongoose = "*"
 
 [dev-packages]
 

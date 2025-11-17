@@ -11,52 +11,83 @@ import src.controllers.databaseController as db
 from typing import Optional
 
 
+# FacialController Flow:
+    # Load known faces from database
+    # Capture new face (from camera or file)
+    # Process new face
+    # Match face
+    
+
 class FacialController:
     """_summary_
     This class is used to control the facial recognition system
-    
+
     Args: 
         class_id (int): The class id to be used for the facial recognition system.
-    
+
     Attributes:
         class_id (int): The class id to be used for the facial recognition system.
         known_faces (dict): The known faces of the class.
     """
-    def __init__(self, class_id: Optional[int] = None):
-    #     self.class_id = class_id
-        # self.known_faces = self.load_known_faces()
-        pass
+
+    def __init__(self, class_id: Optional[int] = None) -> None:
+        self.class_id = class_id
+        self.known_faces = self.load_known_faces()
+        # pass
 
     @staticmethod
     def load_known_faces() -> pandas.Series:
+        """_summary_
+            Loads the known faces from the database.
+        Returns:
+            pandas.Series: _description_
+        """
         student_table = db.StudentTable().read()
         known_faces = student_table.set_index('id')['face_encodings']
         for index, face_encoding in known_faces.items():
             known_faces.at[index] = np.array(face_encoding)
         print(known_faces[known_faces.index == 11])
         print("zero value: ", type(known_faces.values[0]))
-        
+
         return known_faces
 
-    # -- not using this method yet -- 
-    # starts the process of checking in a student 
-    def start_new_entry(self, capture_method: Optional[str] = None):
-        try :
+    # -- not using this method yet --
+        # starts the process of checking in a student
+        # Steps For Entry
             # step 1: capture face
-            capture = self.capture_entry(capture_method)
             # step 2: process image
-            comparison_data = self.process_image(capture)
             # step 3: match face
+    def start_new_entry(self, capture_method: Optional[str] = None):
+        """_summary_
+            Starts a new entry for a student.
+        Args:
+            capture_method (Optional[str], optional): _description_. Defaults to None.
+
+        Returns:
+            _type_: _description_
+        """
+        try:
+            capture = self.capture_entry(capture_method)
+            comparison_data = self.process_image(capture)
             match = self.match_processed_image(comparison_data)
+            
         except Exception as e:
             print("Error: ", e)
             print("Could not start new entry. Please try again.")
 
         return "Check in complete."
 
-    # Step 1: capture face
+    # Step 1
     @staticmethod
     def capture_entry(capture_method: Optional[str] = None) -> np.ndarray:
+        """_summary_
+            Captures the image from the camera or file.
+        Args:
+            capture_method (Optional[str], optional): _description_. Defaults to None.
+
+        Returns:
+            np.ndarray: _description_
+        """
         try:
             capture = cap.Capture(capture_method)
         except Exception as e:
@@ -64,7 +95,7 @@ class FacialController:
             print("Could not capture image. Please try again.")
         load_face = rec.face_recognition.load_image_file(capture)
         return load_face
-        
+
     # Step 2: process image. Gets the face location , encoding, and comparison using recognition module
     @staticmethod
     def process_image(capture: Optional[str] = None) -> np.ndarray:
@@ -72,7 +103,6 @@ class FacialController:
             process the image to get the face encoding.
         Args:
             capture (str, optional): _description_. Defaults to None.
-
         Returns:
             _type_:  np.ndarray: returns processed image in numpy array
         """
@@ -89,21 +119,22 @@ class FacialController:
     # runs a comparison from known faces to the captured face and returns
     @staticmethod
     def match_processed_image(capture: np.ndarray, known_faces: np.ndarray) -> bool:
-        
-        # compare the faces but params are backwards from input to output 
-        new_comparison_data = comp.FacialComparison.compare_faces(known_faces,capture)
-        
+
+        # compare the faces but params are backwards from input to output
+        new_comparison_data = comp.FacialComparison.compare_faces(
+            known_faces, capture)
+
         return new_comparison_data
 
 
-
 def main():
-    os.add_dll_directory(os.environ['CUDA_PATH'])
-    dlib.DLIB_USE_CUDA = True
-    if dlib.DLIB_USE_CUDA:
-        print("Using CUDA for dlib.")
-    else:
-        print("CUDA is not available for dlib.")
+    from utils.gpu_detection import is_gpu_available
+    is_gpu_available()
+
+    facialController = FacialController()
+    known_faces = facialController.load_known_faces()
+    print("Known faces loaded.")
+    print(known_faces)
 
 
 if __name__ == "__main__":

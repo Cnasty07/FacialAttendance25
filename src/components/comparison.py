@@ -1,6 +1,9 @@
 import os
 import face_recognition
-import dlib
+
+# staging for deletion
+# import dlib
+
 import numpy as np
 import pandas as pd
 
@@ -35,6 +38,15 @@ class FacialComparison:
 
     @staticmethod
     def comparison_accuracy(student_facial_imgs=None, new_img: np.ndarray = None) -> np.linalg.norm:
+        """_summary_
+            Calculates the accuracy of the facial recognition comparison.
+        Args:
+            student_facial_imgs (_type_, optional): _description_. Defaults to None.
+            new_img (np.ndarray, optional): _description_. Defaults to None.
+
+        Returns:
+            np.linalg.norm: _description_
+        """
         # accuracy of prediction
         face_distance = face_recognition.face_distance(
             [student_facial_imgs], new_img)
@@ -45,13 +57,8 @@ class FacialComparison:
 
 # Testing Purposes
 def main() -> None:
-    
-    os.add_dll_directory(os.environ['CUDA_PATH'])
-    dlib.DLIB_USE_CUDA = True
-    if dlib.DLIB_USE_CUDA:
-        print("Using CUDA for dlib.")
-    else:
-        print("CUDA is not available for dlib.")
+    from utils.gpu_detection import is_gpu_available
+    is_gpu_available()
     new_comparison = FacialComparison()
     new_comparison.compare_faces()
 

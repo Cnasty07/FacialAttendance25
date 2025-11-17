@@ -1,4 +1,4 @@
-from . import databaseController , facial_controller , view_controller, remoteDatabaseController
+from . import databaseController, facialController, mongooseClient, view_controller
+from . import remoteDatabaseController
 
-
-__all__ = ['databaseController','facial_controller', 'view_controller', 'remoteDatabaseController' ]
+__all__ = ['databaseController', 'facialController', 'view_controller', 'mongooseClient', 'remoteDatabaseController']

@@ -36,8 +36,14 @@ class Capture:
         elif capture_method == 'stored':
             self.start_return_image()
 
+    # Currently not in use.
     @staticmethod
     def start_video_capture() -> np.ndarray:
+        """_summary_
+            Captures video frames from the default camera.
+        Returns:
+            np.ndarray: _description_
+        """
         cap = cv2.VideoCapture(0)
 
         if not cap.isOpened():
@@ -69,8 +75,14 @@ class Capture:
         # not sure if this method works on videos yet
         return face_recognition.load_image_file(frame)
 
+    # Currently not in use.
     @staticmethod
     def start_image_capture() -> np.ndarray:
+        """_summary_
+            Captures a single image from the default camera.
+        Returns:
+            np.ndarray: _description_
+        """
         cap = cv2.VideoCapture(0)
 
         if not cap.isOpened():
@@ -96,8 +108,14 @@ class Capture:
 
         return face_recognition.load_image_file(file_path)
 
+    # Currently not in use.
     @staticmethod
     def start_return_image() -> np.ndarray:
+        """_summary_
+            Returns a stored image for testing purposes.
+        Returns:
+            np.ndarray: _description_
+        """
         return face_recognition.load_image_file('../../database/tests/Musk3.jpg')
 
 

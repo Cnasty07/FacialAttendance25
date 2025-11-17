@@ -1,6 +1,6 @@
 import pytest
 
-import src.controllers.remoteDatabaseController as rdc
+import src.controllers.remoteDB.remoteDatabaseController as rdc
 import src.models.User as user_model
 
 def test_student_model_creation():

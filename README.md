@@ -82,7 +82,7 @@ INSERT ITEMS HERE FOR PL
 │   ├── __init__.py
 │   ├── __pycache__
 │   ├── databaseController.py
-│   └── facial_controller.py
+│   └── facialController.py
 ├── database
 │   ├── __init__.py
 │   ├── __pycache__

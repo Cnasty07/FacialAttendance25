@@ -4,8 +4,9 @@ import numpy as np
 import bson
 
 # INFO: Primarily to be used when capturing and storing face into User model for Student Users.
-# Each Face instance represents a single face encoding associated with a student and a class.
-class Face(BaseModel):
+    # Each Face instance represents a single face encoding associated with a student and a class.
+
+class FaceModel(BaseModel):
     student_id: bson.ObjectId = Field(description="Student's unique identifier", alias="student_id")
     class_id: bson.ObjectId = Field(description="Class's unique identifier", alias="course_code")
     face_encoding: list[float] = Field(description="Face encoding data array")
@@ -16,15 +17,8 @@ class Face(BaseModel):
         "validate_assignment": True,
     })
 
-
-
 def main():
-    face_instance = Face(
-        student_id=bson.ObjectId(),
-        class_id=bson.ObjectId(),
-        face_encoding=[]
-    )
-    print(face_instance)
+    pass
 
 if __name__ == "__main__":
     main()

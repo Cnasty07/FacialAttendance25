@@ -1,5 +1,7 @@
 import os
-import cv2
+
+# Staging for facial recognition component
+# import cv2
 import face_recognition
 from PIL import Image, ImageDraw
 import numpy as np
@@ -75,7 +77,8 @@ def main() -> None:
     sys.path.append('../../')
     new_face = FacialRecognition()
     new_face.img_path = "./database/tests/ruben1.jpg"
-    print(new_face.get_face_encoding(new_face.img_path))
+    face_data = new_face.get_face_encoding(new_face.img_path)
+    print(face_data, type(face_data), face_data.shape)
 
 if __name__ == '__main__':
     main()

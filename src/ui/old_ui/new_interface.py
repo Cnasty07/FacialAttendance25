@@ -14,27 +14,31 @@ from PIL import Image, ImageTk
 
 
 # Local Imports
-from src.controllers.databaseController import ClassTable, AttendanceTable, StudentTable , FaceTable
-from src.controllers.facial_controller import FacialController
+from src.controllers.databaseController import ClassTable, AttendanceTable, StudentTable, FaceTable
+from src.controllers.facialController import FacialController
 
 # TODO: Refactor this into a proper Tkinter Frame for better integration with AppController
 # TODO: Change database calls to MongoDB later on.
 
 # --- Facial Attendance Student View ---
+
+
 class FacialAttendanceSystemApp:
     def __init__(self, root):
-        ## Initialize Facial Window
+        # Initialize Facial Window
         self.root = root
         self.root.title("Facial Attendance System")
         self.root.geometry("800x600")
         self.root.configure(background="grey")
         self.file_path = ""
-        self.title_label = Label(root, text="Facial Attendance System", font=("Helvetica", 20, "bold"))
+        self.title_label = Label(
+            root, text="Facial Attendance System", font=("Helvetica", 20, "bold"))
         self.title_label.pack(pady=10)
 
         try:
-            ## Class List
-            classes_list = ClassTable(sys.path[0] + "/database/school.db").read()
+            # Class List
+            classes_list = ClassTable(
+                sys.path[0] + "/database/school.db").read()
             print(classes_list)
         except Exception as e:
             print(f"An error occurred: {e}")
@@ -42,27 +46,28 @@ class FacialAttendanceSystemApp:
         def on_select(event):
             selected_item = self.class_list.get()
 
-        ## Extract class names for the combobox
+        # Extract class names for the combobox
         class_names = [cls for cls in classes_list['name']]
 
-        ## Class List Dropdown
+        # Class List Dropdown
         self.class_list = ttk.Combobox(root)
         self.class_list['values'] = class_names
         self.class_list.set("Select Class")
-        self.class_list.bind("<<ComboboxSelected>>",on_select)
+        self.class_list.bind("<<ComboboxSelected>>", on_select)
         self.class_list.pack(pady=10)
 
-        ## Camera Feed Frame
+        # Camera Feed Frame
         self.camera_frame = Label(root, width=200, height=400)
         self.camera_frame.pack(pady=10, expand=False, fill="both")
-        
-        ## Input field
-        self.input_label = Label(root, text="Enter Student Name:", font=("Helvetica", 14))
+
+        # Input field
+        self.input_label = Label(
+            root, text="Enter Student Name:", font=("Helvetica", 14))
         self.input_label.pack(pady=5)
         self.input_entry = tk.Entry(root, font=("Helvetica", 14))
         self.input_entry.pack(pady=5)
 
-        ## Record Attendance Button
+        # Record Attendance Button
         self.record_button = Button(
             root,
             text="Record Attendance",
@@ -70,14 +75,15 @@ class FacialAttendanceSystemApp:
             command=self.record_attendance
         )
         self.record_button.pack(pady=10)
-        
-        ## Search Section
-        self.search_label = Label(root, text="Search Attendance Records:", font=("Helvetica", 14))
+
+        # Search Section
+        self.search_label = Label(
+            root, text="Search Attendance Records:", font=("Helvetica", 14))
         self.search_label.pack(pady=5)
         self.search_entry = tk.Entry(root, font=("Helvetica", 14))
         self.search_entry.pack(pady=5)
 
-        ## Buttons for searching
+        # Buttons for searching
         self.search_student_button = Button(
             root,
             text="Search Student",
@@ -94,7 +100,7 @@ class FacialAttendanceSystemApp:
         )
         self.search_date_button.pack(pady=5)
 
-        ## Initialize camera and thread
+        # Initialize camera and thread
         self.cap = cv2.VideoCapture(0)  # Open the default camera
         self.running = True
         self.update_camera()
@@ -104,7 +110,8 @@ class FacialAttendanceSystemApp:
         """Query attendance records by student name."""
         student_name = self.search_entry.get()
         if not student_name:
-            messagebox.showerror("Error", "Please enter a student name to search.")
+            messagebox.showerror(
+                "Error", "Please enter a student name to search.")
             return
 
         try:
@@ -115,7 +122,8 @@ class FacialAttendanceSystemApp:
                     SELECT id FROM student WHERE name LIKE ?
                 )
             """
-            records = pd.read_sql_query(query, attendance_table.conn, params=(f"%{student_name}%",))
+            records = pd.read_sql_query(
+                query, attendance_table.conn, params=(f"%{student_name}%",))
             self.display_results(records)
         except Exception as e:
             messagebox.showerror("Error", f"An error occurred: {e}")
@@ -131,7 +139,8 @@ class FacialAttendanceSystemApp:
         try:
             attendance_table = AttendanceTable("./database/school.db")
             query = "SELECT * FROM attendance WHERE date LIKE ?"
-            records = pd.read_sql_query(query, attendance_table.conn, params=(f"%{date}%",))
+            records = pd.read_sql_query(
+                query, attendance_table.conn, params=(f"%{date}%",))
             self.display_results(records)
         except Exception as e:
             messagebox.showerror("Error", f"An error occurred: {e}")
@@ -140,7 +149,8 @@ class FacialAttendanceSystemApp:
     def display_results(self, records) -> None:
         """Display the queried records in a popup window."""
         if records.empty:
-            messagebox.showinfo("No Results", "No records found for the given query.")
+            messagebox.showinfo(
+                "No Results", "No records found for the given query.")
             return
 
         result_window = tk.Toplevel(self.root)
@@ -159,9 +169,9 @@ class FacialAttendanceSystemApp:
             tree.insert("", "end", values=list(row))
 
         tree.pack(fill="both", expand=True)
-        close_button = Button(result_window, text="Close", command=result_window.destroy)
+        close_button = Button(result_window, text="Close",
+                              command=result_window.destroy)
         close_button.pack(pady=10)
-        
 
         # Initialize camera and thread
         self.cap = cv2.VideoCapture(0)  # Open the default camera
@@ -189,7 +199,7 @@ class FacialAttendanceSystemApp:
     # -- Confirm Attendance --
     def confirm_attendance(self, student_name, class_name, face_path) -> None:
         """Match face and confirm attendance."""
-        
+
         try:
             # Process and match face loads image and gets encoding
             unknown_face = FacialController.process_image(face_path)
@@ -197,17 +207,18 @@ class FacialAttendanceSystemApp:
             try:
                 load_known_faces = FacialController.load_known_faces()
                 # collects only the face encodings
-                known_encodings = [face_encoding for face_encoding in load_known_faces]
+                known_encodings = [
+                    face_encoding for face_encoding in load_known_faces]
                 # Compare the unknown face to the known faces
-                is_match = self.fc.match_processed_image(unknown_face, known_encodings)
-    
+                is_match = self.fc.match_processed_image(
+                    unknown_face, known_encodings)
+
                 student_id = load_known_faces.index[is_match.index(True)]
-                
+
             except ValueError:
                 print("No match found.")
                 student_id = None
-            
-            
+
             # Compare the unknown face to the known faces
             # is_match = FacialController.match_processed_image(unknown_face, known_encodings)
 
@@ -219,31 +230,34 @@ class FacialAttendanceSystemApp:
                 student_table_class = StudentTable("./database/school.db")
                 Student_table = student_table_class.read()
                 try:
-                    student_record = Student_table.loc[Student_table['id'] == student_id]
+                    student_record = Student_table.loc[Student_table['id']
+                                                       == student_id]
                 except Exception as e:
                     print(f"Student not found:  {e}")
-                    student_id = math.randomInt(20,100)
-                    
-                    
+                    student_id = math.randomInt(20, 100)
+
                 if student_record:
                     student_id = student_record['id']
                     print(student_id)
-                    AttendanceTable("./database/school.db").create(student_id, class_name, formatted_time)
-                    message = (f"Successfully recorded student {student_name} " f"on {formatted_time} for class {class_name}.")
+                    AttendanceTable(
+                        "./database/school.db").create(student_id, class_name, formatted_time)
+                    message = (
+                        f"Successfully recorded student {student_name} " f"on {formatted_time} for class {class_name}.")
                 else:
-                    
-                    new_student = student_table_class.create(student_id, student_name, [class_name], unknown_face)
-                    
+
+                    new_student = student_table_class.create(
+                        student_id, student_name, [class_name], unknown_face)
+
                     message = (f"New student {student_name} added and attendance recorded "
                                f"on {formatted_time} for class {class_name}.")
-                
+
             else:
                 message = "No match found. Attendance not recorded."
         except Exception as e:
             print("Error: ", e)
             message = "An error occurred. Please try again."
 
-        ## Show confirmation message in a new window
+        # Show confirmation message in a new window
         self.confirm_window = tk.Toplevel(self.root)
         self.confirm_window.title("Attendance Confirmation")
         self.confirm_window.geometry("400x200")
@@ -251,10 +265,11 @@ class FacialAttendanceSystemApp:
             self.confirm_window, text=message, font=("Helvetica", 12), wraplength=350, justify="center"
         )
         self.confirmation_label.pack(pady=20)
-        close_button = Button(self.confirm_window, text="Close", command=self.confirm_window.destroy)
+        close_button = Button(self.confirm_window, text="Close",
+                              command=self.confirm_window.destroy)
         close_button.pack(pady=10)
 
-    # -- Record Attendance -- 
+    # -- Record Attendance --
     def record_attendance(self) -> None:
         """Capture image, detect face, and initiate attendance recording."""
         ret, frame = self.cap.read()
@@ -264,8 +279,10 @@ class FacialAttendanceSystemApp:
 
         # Face detection
         gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_frontalface_default.xml")
-        faces = face_cascade.detectMultiScale(gray_frame, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
+        face_cascade = cv2.CascadeClassifier(
+            cv2.data.haarcascades + "haarcascade_frontalface_default.xml")
+        faces = face_cascade.detectMultiScale(
+            gray_frame, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
 
         if len(faces) == 0:
             print("No face detected. Please try again.")
@@ -286,8 +303,8 @@ class FacialAttendanceSystemApp:
         # Get student name and class name from input fields
         student_name = self.input_entry.get() or "Unknown Student"
         class_name = self.class_list.get() or "Unknown Class"
-        threading.Thread(target=self.confirm_attendance, args=(student_name, class_name, face_path)).start()
-
+        threading.Thread(target=self.confirm_attendance, args=(
+            student_name, class_name, face_path)).start()
 
     def close(self) -> None:
         """Clean up resources when the application is closed."""

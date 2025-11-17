@@ -14,13 +14,15 @@ from PIL import Image, ImageTk
 
 
 # Local Imports
-from src.controllers.databaseController import ClassTable, AttendanceTable, StudentTable , FaceTable
-from src.controllers.facial_controller import FacialController
+from src.controllers.databaseController import ClassTable, AttendanceTable, StudentTable, FaceTable
+from src.controllers.facialController import FacialController
 
-
-# TODO 1: Refactor this into a proper Tkinter Frame for better integration with AppController
-# TODO 2: Change database calls to MongoDB later on.
-# from src.controllers.remoteDatabaseController import StudentDatabaseController
+from src.controllers import mongooseClient
+# TODO: Refactor and Change DB to mongo
+    ## 1: Refactor this into a proper Tkinter Frame for better integration with AppController
+    ## 2: Change database calls to MongoDB later on. (classes already done here)
+        ## 1. Load face_data from MongoDB instead of local SQLite
+        ## 2. Load attendance data from MongoDB instead of local SQLite
 
 # --- Facial Attendance Student View (Tkinter Frame) ---
 class FacialStudentPanel(tk.Frame):
@@ -31,20 +33,20 @@ class FacialStudentPanel(tk.Frame):
     using `self` as the frame instead of manipulating the parent window.
     """
 
-    def __init__(self, parent, controller = None) -> None:
+    def __init__(self, parent, controller=None) -> None:
         super().__init__(parent)
         self.parent = parent
         self.controller = controller
         self.db_path = "./database/school.db"
         self.file_path = ""
-        
-        # TODO 2: Database connection setup
-        ## New database connection for remote MongoDB
-        # self.remote_db_controller = StudentDatabaseController()
-        # self.db = self.remote_db_controller.get_database()
+
+        # New database connection for remote MongoDB
+        self.remote_db_controller = mongooseClient.RemoteDBC()
+        self.db = self.remote_db_controller.db
 
         # Title label (inside this frame)
-        self.title_label = Label(self, text="Facial Attendance System", font=("Helvetica", 20, "bold"))
+        self.title_label = Label(
+            self, text="Facial Attendance System", font=("Helvetica", 20, "bold"))
         self.title_label.pack(pady=10)
 
         # Initialize facial controller (may be stateful)
@@ -54,18 +56,22 @@ class FacialStudentPanel(tk.Frame):
             # Fallback to static usage if FacialController only exposes staticmethods
             self.fc = FacialController
 
-        # Load classes for combobox
-        try:
-            classes_list = ClassTable(self.db_path).read()
-        except Exception as e:
-            print(f"An error occurred loading classes: {e}")
-            classes_list = []
 
         def on_select(event):
             _ = self.class_list.get()
+            print(f"Selected class: {_}")
 
+        
+        # Loading Class Names from remote now
+        try:
+            classes_list = []
+            for classes in self.db.Classes.find():
+                classes_list.append(classes)
+        except Exception as e:
+            print(f"An error occurred loading classes: {e}")
+            classes_list = []
         # Extract class names
-        class_names = [cls for cls in classes_list['name']] if hasattr(classes_list, 'get') else []
+        class_names = [cls['name'] for cls in classes_list]
 
         # Class selection combobox
         self.class_list = ttk.Combobox(self)
@@ -79,26 +85,31 @@ class FacialStudentPanel(tk.Frame):
         self.camera_frame.pack(pady=10, expand=False, fill="both")
 
         # Input field for student name
-        self.input_label = Label(self, text="Enter Student Name:", font=("Helvetica", 14))
+        self.input_label = Label(
+            self, text="Enter Student Name:", font=("Helvetica", 14))
         self.input_label.pack(pady=5)
         self.input_entry = tk.Entry(self, font=("Helvetica", 14))
         self.input_entry.pack(pady=5)
 
         # Record attendance button
-        self.record_button = Button(self, text="Record Attendance", font=("Helvetica", 14), command=self.record_attendance)
+        self.record_button = Button(self, text="Record Attendance", font=(
+            "Helvetica", 14), command=self.record_attendance)
         self.record_button.pack(pady=10)
 
         # Search section
-        self.search_label = Label(self, text="Search Attendance Records:", font=("Helvetica", 14))
+        self.search_label = Label(
+            self, text="Search Attendance Records:", font=("Helvetica", 14))
         self.search_label.pack(pady=5)
         self.search_entry = tk.Entry(self, font=("Helvetica", 14))
         self.search_entry.pack(pady=5)
 
         # Search buttons
-        self.search_student_button = Button(self, text="Search Student", font=("Helvetica", 14), command=self.search_student)
+        self.search_student_button = Button(self, text="Search Student", font=(
+            "Helvetica", 14), command=self.search_student)
         self.search_student_button.pack(pady=5)
 
-        self.search_date_button = Button(self, text="Search Date", font=("Helvetica", 14), command=self.search_date)
+        self.search_date_button = Button(self, text="Search Date", font=(
+            "Helvetica", 14), command=self.search_date)
         self.search_date_button.pack(pady=5)
 
         # Camera
@@ -107,12 +118,13 @@ class FacialStudentPanel(tk.Frame):
         # Start camera updates
         self.after(10, self.update_camera)
 
-    ## -- Search by Student Name --
+    # -- Search by Student Name --
     def search_student(self) -> None:
         """Query attendance records by student name."""
         student_name = self.search_entry.get()
         if not student_name:
-            messagebox.showerror("Error", "Please enter a student name to search.")
+            messagebox.showerror(
+                "Error", "Please enter a student name to search.")
             return
 
         try:
@@ -123,7 +135,8 @@ class FacialStudentPanel(tk.Frame):
                     SELECT id FROM student WHERE name LIKE ?
                 )
             """
-            records = pd.read_sql_query(query, attendance_table.conn, params=(f"%{student_name}%",))
+            records = pd.read_sql_query(
+                query, attendance_table.conn, params=(f"%{student_name}%",))
             self.display_results(records)
         except Exception as e:
             messagebox.showerror("Error", f"An error occurred: {e}")
@@ -139,7 +152,8 @@ class FacialStudentPanel(tk.Frame):
         try:
             attendance_table = AttendanceTable("./database/school.db")
             query = "SELECT * FROM attendance WHERE date LIKE ?"
-            records = pd.read_sql_query(query, attendance_table.conn, params=(f"%{date}%",))
+            records = pd.read_sql_query(
+                query, attendance_table.conn, params=(f"%{date}%",))
             self.display_results(records)
         except Exception as e:
             messagebox.showerror("Error", f"An error occurred: {e}")
@@ -148,7 +162,8 @@ class FacialStudentPanel(tk.Frame):
     def display_results(self, records) -> None:
         """Display the queried records in a popup window."""
         if records.empty:
-            messagebox.showinfo("No Results", "No records found for the given query.")
+            messagebox.showinfo(
+                "No Results", "No records found for the given query.")
             return
 
         result_window = tk.Toplevel(self.parent)
@@ -167,9 +182,9 @@ class FacialStudentPanel(tk.Frame):
             tree.insert("", "end", values=list(row))
 
         tree.pack(fill="both", expand=True)
-        close_button = Button(result_window, text="Close", command=result_window.destroy)
+        close_button = Button(result_window, text="Close",
+                              command=result_window.destroy)
         close_button.pack(pady=10)
-        
 
         # Initialize camera and thread
         self.cap = cv2.VideoCapture(0)  # Open the default camera
@@ -196,7 +211,15 @@ class FacialStudentPanel(tk.Frame):
 
     # -- Confirm Attendance --
     def confirm_attendance(self, student_name, class_name, face_path) -> None:
-        """Match face and confirm attendance."""
+        """_summary_
+            Confirm attendance after processing and matching face.
+            Args:
+                student_name (_type_): _description_
+                class_name (_type_): _description_
+                face_path (_type_): _description_
+                Returns:
+                None
+        """
         
         try:
             # Process and match face loads image and gets encoding
@@ -207,15 +230,15 @@ class FacialStudentPanel(tk.Frame):
                 # collects only the face encodings
                 known_encodings = [face_encoding for face_encoding in load_known_faces]
                 # Compare the unknown face to the known faces
-                is_match = self.fc.match_processed_image(unknown_face, known_encodings)
-    
+                is_match = self.fc.match_processed_image(
+                    unknown_face, known_encodings)
+
                 student_id = load_known_faces.index[is_match.index(True)]
-                
+
             except ValueError:
                 print("No match found.")
                 student_id = None
-            
-            
+
             # Compare the unknown face to the known faces
             # is_match = FacialController.match_processed_image(unknown_face, known_encodings)
 
@@ -227,31 +250,34 @@ class FacialStudentPanel(tk.Frame):
                 student_table_class = StudentTable("./database/school.db")
                 Student_table = student_table_class.read()
                 try:
-                    student_record = Student_table.loc[Student_table['id'] == student_id]
+                    student_record = Student_table.loc[Student_table['id']
+                                                       == student_id]
                 except Exception as e:
                     print(f"Student not found:  {e}")
-                    student_id = math.randomInt(20,100)
-                    
-                    
+                    student_id = math.randomInt(20, 100)
+
                 if student_record:
                     student_id = student_record['id']
                     print(student_id)
-                    AttendanceTable("./database/school.db").create(student_id, class_name, formatted_time)
-                    message = (f"Successfully recorded student {student_name} " f"on {formatted_time} for class {class_name}.")
+                    AttendanceTable(
+                        "./database/school.db").create(student_id, class_name, formatted_time)
+                    message = (
+                        f"Successfully recorded student {student_name} " f"on {formatted_time} for class {class_name}.")
                 else:
-                    
-                    new_student = student_table_class.create(student_id, student_name, [class_name], unknown_face)
-                    
+
+                    new_student = student_table_class.create(
+                        student_id, student_name, [class_name], unknown_face)
+
                     message = (f"New student {student_name} added and attendance recorded "
                                f"on {formatted_time} for class {class_name}.")
-                
+
             else:
                 message = "No match found. Attendance not recorded."
         except Exception as e:
             print("Error: ", e)
             message = "An error occurred. Please try again."
 
-        ## Show confirmation message in a new window
+        # Show confirmation message in a new window
         self.confirm_window = tk.Toplevel(self.parent)
         self.confirm_window.title("Attendance Confirmation")
         self.confirm_window.geometry("400x200")
@@ -259,10 +285,11 @@ class FacialStudentPanel(tk.Frame):
             self.confirm_window, text=message, font=("Helvetica", 12), wraplength=350, justify="center"
         )
         self.confirmation_label.pack(pady=20)
-        close_button = Button(self.confirm_window, text="Close", command=self.confirm_window.destroy)
+        close_button = Button(self.confirm_window, text="Close",
+                              command=self.confirm_window.destroy)
         close_button.pack(pady=10)
 
-    # -- Record Attendance -- 
+    # -- Record Attendance --
     def record_attendance(self) -> None:
         """Capture image, detect face, and initiate attendance recording."""
         ret, frame = self.cap.read()
@@ -272,8 +299,10 @@ class FacialStudentPanel(tk.Frame):
 
         # Face detection
         gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_frontalface_default.xml")
-        faces = face_cascade.detectMultiScale(gray_frame, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
+        face_cascade = cv2.CascadeClassifier(
+            cv2.data.haarcascades + "haarcascade_frontalface_default.xml")
+        faces = face_cascade.detectMultiScale(
+            gray_frame, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
 
         if len(faces) == 0:
             print("No face detected. Please try again.")
@@ -294,8 +323,8 @@ class FacialStudentPanel(tk.Frame):
         # Get student name and class name from input fields
         student_name = self.input_entry.get() or "Unknown Student"
         class_name = self.class_list.get() or "Unknown Class"
-        threading.Thread(target=self.confirm_attendance, args=(student_name, class_name, face_path)).start()
-
+        threading.Thread(target=self.confirm_attendance, args=(
+            student_name, class_name, face_path)).start()
 
     def close(self) -> None:
         """Clean up resources when the application is closed."""
