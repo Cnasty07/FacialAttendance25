@@ -1,9 +1,8 @@
 import os
 import bson
 import numpy as np
-from pydantic import BeforeValidator, Field, ValidationError, StrictStr, BaseModel, ConfigDict
+from pydantic import BeforeValidator, Field, StrictStr, BaseModel, ConfigDict
 from typing import Optional, Annotated 
-from numpy.typing import NDArray
 
 # INFO: This is the User Model that will be used for both Student and Admin Users
 # After auth is complete, we can instantiate the User object with the relevant data.
@@ -20,14 +19,14 @@ class UserModel(BaseModel):
         "arbitrary_types_allowed": True,
         "extra": "forbid",
         "validate_assignment": True,
-        "title": "UserModel",
+        "title": "User_Model",
     })
 
 ## -- STUDENT USER MODEL --
 class StudentUser(UserModel):
     enrolled_classes: list[PyObjectId] = Field(alias="enrolled_classes", description="List of enrolled class IDs")
     # FIXME: Need to convert numpy arrays to lists for Pydantic compatibility and mongo insertion
-    face_data: list = Field(alias="face_data", description="List of face encoding data arrays")
+    face_data: list[list[float]] = Field(alias="face_data", description="List of face encoding data arrays")
     # attendance_records: dict[bson.ObjectId, list[str]] = None  # classID: [dates]
 
 ## -- END OF STUDENT USER MODEL --
@@ -36,7 +35,6 @@ class StudentUser(UserModel):
 
 ## -- ADMIN USER MODEL --
 class AdminUser(UserModel):
-    role: StrictStr = Field(description="Role of the admin user", min_length=1)
-    
-## -- END OF ADMIN USER MODEL --
+    role: StrictStr = Field(description="Role of the admin user", min_length=1, alias="role")
 
+## -- END OF ADMIN USER MODEL --

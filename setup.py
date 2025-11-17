@@ -18,6 +18,10 @@ setup(
         'pandas', 
         'scikit-learn',
         'Pillow',
+        'setuptools',
+        'pydantic',
+        'pymongo[srv]',
+        
     ],
     entry_points={
         'console_scripts': [

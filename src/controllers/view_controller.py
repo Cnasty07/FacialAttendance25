@@ -1,9 +1,11 @@
 import tkinter as tk
 from src import ui
 
-# TODO: AppController to manage frames aka the different views of the application
 
-# FIXME: Worked in the main.py file before, moving here for better organization and need to change activate from root to app: AppController later
+
+# TODO: New Frame Switching Mechanism with lazy-loading and on_show hooks. Needs Testing For Functionality.
+
+# -- Application Controller for Frame Management --
 class AppController(tk.Tk):
     def __init__(self) -> None:
         super().__init__()
@@ -19,9 +21,8 @@ class AppController(tk.Tk):
         for F, name in (
             (ui.choose_user_panel.ChooseUserPanel, "ChooseUserPanel"),
             (ui.admin_panel.AdminPanel, "AdminPanel"),
-            # (ui.new_interface.FacialAttendanceSystemApp, "FacialAttendanceSystemApp"),
+            (ui.facial_student_panel.FacialStudentPanel, "FacialStudentPanel"),
         ):
-            frame = F(container)
             # pass controller so panels can call controller.show_frame(...)
             frame = F(container, controller=self)
             self.frames[name] = frame
@@ -45,4 +46,4 @@ class AppController(tk.Tk):
             except Exception as e:
                 print(f"Error in on_show for {cont}: {e}")
 
-
+# -- END Application Controller for Frame Management --

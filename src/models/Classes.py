@@ -3,13 +3,10 @@ import datetime
 import bson
 
 from pydantic import Field , BaseModel, ConfigDict
-from pydantic.dataclasses import dataclass
-from pydantic.types import  StrictInt, StrictStr, AwareDatetime
-from pymongo.mongo_client import MongoClient
-from pymongo.server_api import ServerApi
+from pydantic.types import  StrictInt, StrictStr
 
-# @dataclass(init=True, repr=True)
-class Classes(BaseModel):
+
+class ClassesModel(BaseModel):
     name: StrictStr = Field(description="Name of the class/course", min_length=1)
     course_code: StrictInt = Field(description="Numeric course code", ge=1)
     roster: list[bson.ObjectId]
@@ -24,14 +21,14 @@ class Classes(BaseModel):
 
 
 def main():
-    class_instance = Classes(
+    class_instance = ClassesModel(
         name="Introduction to Programming",
         course_code=102,
         roster=[],
         start_time=datetime.time(9, 0),
         end_time=datetime.time(10, 30)
     )
-    print(class_instance.__repr__())
+    print(class_instance.model_dump())
 
 if __name__ == "__main__":
     main()

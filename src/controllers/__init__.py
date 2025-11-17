@@ -1,3 +1,4 @@
-from . import databaseController , facial_controller, remoteDatabaseController , view_controller
+from . import databaseController , facial_controller , view_controller, remoteDatabaseController
 
-__all__ = ['databaseController','facial_controller', 'remoteDatabaseController', 'view_controller' ]
+
+__all__ = ['databaseController','facial_controller', 'view_controller', 'remoteDatabaseController' ]
