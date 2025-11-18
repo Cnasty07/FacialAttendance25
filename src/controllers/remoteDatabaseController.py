@@ -1,62 +1,56 @@
-import datetime
 
-from pymongo.mongo_client import MongoClient
-from pymongoose import set_schemas, set_schemas_from_list
-from pymongoose.mongo_types import MongoException, MongoError
+from src.models.User import StudentUserSchema
+from src.models.Classes import ClassesSchema
 
-from src.models.remoteModels import StudentUser, Classes
 from src.controllers.mongooseClient import RemoteDBC
 
 # TODO: Finish using this controller for remote DB operations
 
 class remoteController:
     def __init__(self) -> None:
-        self.rClient = RemoteDBC()
+        self.rClient = RemoteDBC() # Initialize remote DB connection
+        self.Student = self.rClient.db.Student
+        self.Classes = self.rClient.db.Classes
 
-    def get_student(self,student_email: str):
-        student = self.rClient.db.Student.find_one({"email": student_email})
+    def get_student(self,student_email: str) -> StudentUserSchema | None:
+        try:
+            student = self.Student.find_one({"email": student_email})
+        except Exception as e:
+            print("Error fetching student:", e)
+            return None
+
         return student
 
-    def get_class(self, class_name: str):
-        classes = self.rClient.db.Classes.find_one({"name": class_name})
+    def get_class(self, class_name: str) -> ClassesSchema | None:
+        try:
+            classes = self.Classes.find_one({"name": class_name})
+        except Exception as e:
+            print("Error fetching class:", e)
+            return None
+        
         return classes
 
-    def get_all_classes(self) -> list[Classes]:
-        classes = self.rClient.db.Classes.find({})
+    def get_all_classes(self) -> list[ClassesSchema]:
+        try:
+            classes = self.Classes.find({})
+        except Exception as e:
+            print("Error fetching classes:", e)
+            return []
         all_classes = [cls for cls in classes]
         return all_classes
 
 
 def main() -> None:
-   # rdbc = RemoteDBC() # Starts connection
-    # new_student = StudentUser(
-    #     name="John Doe",
-    #     email="john.doe@example.com",
-    #     # face_data=[np.random.rand(128) for _ in range(5)],
-    # )
-    # print(new_student)
-
-    # id = new_student.save()
-    # print("Inserted Student ID:", id)
+    rmdbc = remoteController()
+    # print(type(rmdbc.get_student("rreyes@tamusa.edu")))
+    # student: StudentUserSchema = rmdbc.get_student("rreyes@tamusa.edu")
+    # print(student.keys())
+    # # BUG: potential issue with id and _id mapping here. Need to check tomorrow.
     
-    # # Finding and deleting the inserted test data
-    # load_student = rdbc.db.Student.find_one({"name": "John Doe"})
-    # print("Loaded Student:", load_student, type(load_student))
-    # rdbc.db.Student.delete_one({"_id": load_student['_id']})  # Clean up inserted test data
-    # classes = Classes(
-    #     name="Biology 101",
-    #     course_code=104,
-    #     start_time=datetime.datetime.now(),
-    #     end_time=datetime.datetime.now() + datetime.timedelta(hours=1)
-    # )
-    # class_id = classes.save()
-    # print("Inserted Class ID:", class_id)
-
-    # load_class = rdbc.db.Classes.find_one({"name": "Biology 101"})
-    # print("Loaded Class:", load_class, type(load_class))
-
-    # rdbc.db.Classes.delete_one({"_id": load_class['_id']})  # Clean up inserted test data
-    pass
+    # from src.models.User import StudentUserModel
+    # studentModel = StudentUserModel.from_mongo(student)
+    # print(studentModel)
+    
 
 if __name__ == "__main__":
     main()

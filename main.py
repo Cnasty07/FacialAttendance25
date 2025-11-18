@@ -4,6 +4,7 @@ import sys
 from utils import gpu_detection
 from src.controllers.view_controller import AppController
 
+
 # TODO: Finish Entry to application
 
 # TODO: Test New Tkinter Frame Switching Mechanism, Add Switch User Button.

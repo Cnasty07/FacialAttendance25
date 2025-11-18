@@ -1,10 +1,10 @@
 import os
 import tkinter as tk
-import src.controllers.databaseController as db
-import pandas as pd
 
 # TODO: Implement Admin Panel functionality
-
+    # 1. Need to get and show all classes
+    # 2. Need to get and show all students
+    # 3. Need to implement adding/removing students and classes
 
 class AdminPanel(tk.Frame):
     def __init__(self, parent, controller=None) -> None:

@@ -7,7 +7,7 @@ import face_recognition
 import numpy as np
 import pandas as pd
 
-from src.controllers.databaseController import ClassTable
+# from src.controllers.databaseController import ClassTable
 
 print(os.path.dirname(os.path.relpath(__file__)))
 
@@ -17,7 +17,7 @@ print(os.path.dirname(os.path.relpath(__file__)))
 class FacialComparison:
 
     @staticmethod
-    def compare_faces(known_faces_encodings: np.ndarray, new_img_encodings: np.ndarray = None) -> dict:
+    def compare_faces(known_faces_encodings: np.ndarray, new_img_encodings: np.ndarray = None) -> list[bool]:
         """_summary_
         Checks database for a match of the new image. If found returns the student_id and the result of the comparison.
         If not found returns None.
@@ -37,7 +37,7 @@ class FacialComparison:
         return comparison
 
     @staticmethod
-    def comparison_accuracy(student_facial_imgs=None, new_img: np.ndarray = None) -> np.linalg.norm:
+    def comparison_accuracy(student_facial_imgs=None, new_img: np.ndarray | None= None) -> np.ndarray:
         """_summary_
             Calculates the accuracy of the facial recognition comparison.
         Args:
@@ -59,8 +59,8 @@ class FacialComparison:
 def main() -> None:
     from utils.gpu_detection import is_gpu_available
     is_gpu_available()
-    new_comparison = FacialComparison()
-    new_comparison.compare_faces()
+    # new_comparison = FacialComparison()
+    # new_comparison.compare_faces()
 
 
 if __name__ == '__main__':

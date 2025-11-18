@@ -14,7 +14,8 @@ from PIL import Image, ImageTk
 
 
 # Local Imports
-from src.controllers.databaseController import ClassTable, AttendanceTable, StudentTable, FaceTable
+# from src.controllers.databaseController import ClassTable, AttendanceTable, StudentTable, FaceTable
+from src.controllers.databaseController import AttendanceTable, StudentTable
 from src.controllers.facialController import FacialController
 
 from src.controllers import mongooseClient
@@ -60,6 +61,13 @@ class FacialStudentPanel(tk.Frame):
         def on_select(event):
             _ = self.class_list.get()
             print(f"Selected class: {_}")
+            ## searching for data for class
+            for classes in self.db.Classes.find():
+                if classes['name'] == _:
+                    print(f"Found class data: {classes}")
+                    # self.file_path = classes['face_data_path']
+                    # print(f"Face data path set to: {self.file_path}")
+                    break
 
         
         # Loading Class Names from remote now
@@ -83,7 +91,7 @@ class FacialStudentPanel(tk.Frame):
         # Camera feed frame (Label used to hold image)
         self.camera_frame = Label(self, width=200, height=400)
         self.camera_frame.pack(pady=10, expand=False, fill="both")
-
+        
         # Input field for student name
         self.input_label = Label(
             self, text="Enter Student Name:", font=("Helvetica", 14))
@@ -194,7 +202,7 @@ class FacialStudentPanel(tk.Frame):
     # -- Update Camera Feed --
     def update_camera(self) -> None:
         """Update the camera feed in the GUI with optional face detection."""
-        if not self.running:
+        if not self.running or self.cap is None:
             return
 
         ret, frame = self.cap.read()

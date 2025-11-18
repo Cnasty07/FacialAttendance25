@@ -4,7 +4,6 @@ import face_recognition
 from datetime import datetime
 import numpy as np
 
-
 # -- Capture Class --
 # Summary: This class handles video and image capture using OpenCV.
 class Capture:

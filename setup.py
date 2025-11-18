@@ -22,8 +22,6 @@ setup(
         'pydantic',
         'pymongo[srv]',
         'pymongoose',
-        
-        
     ],
     entry_points={
         'console_scripts': [

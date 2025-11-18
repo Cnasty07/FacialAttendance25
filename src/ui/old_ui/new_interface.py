@@ -14,7 +14,8 @@ from PIL import Image, ImageTk
 
 
 # Local Imports
-from src.controllers.databaseController import ClassTable, AttendanceTable, StudentTable, FaceTable
+from src.controllers.databaseController import ClassTable, AttendanceTable, StudentTable
+# from src.controllers.databaseController import FaceTable
 from src.controllers.facialController import FacialController
 
 # TODO: Refactor this into a proper Tkinter Frame for better integration with AppController

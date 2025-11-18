@@ -39,8 +39,53 @@ class ChooseUserPanel(tk.Frame):
 
     def user_selected(self) -> bool:
         print("User selected")
+
+        # Prompt for email and switch to FacialStudentPanel
         if self.controller:
             try:
+                # Prompt for email in a modal dialog
+                win = tk.Toplevel(self)
+                win.title("Enter Email")
+                win.geometry("350x130")
+                win.resizable(False, False)
+                tk.Label(win, text="Please enter your email:", font=("Arial", 11)).pack(pady=(10, 5), padx=10)
+
+                email_var = tk.StringVar()
+                entry = tk.Entry(win, textvariable=email_var, width=40, font=("Arial", 10))
+                entry.pack(padx=10)
+                entry.focus_set()
+
+                def submit_email():
+                    email = email_var.get().strip()
+                    if email:
+                        print("Email entered:", email)
+                        from src.controllers.remoteDatabaseController import remoteController
+                        rmc = remoteController()
+                        student = rmc.get_student(email)
+                        print(student)
+                        if not student:
+                            print("No student found with that email.")
+                            # messagebox.showerror("Error", "No student found with that email.")
+                            tk.Label(win, text="No student found with that email.", fg="red", font=("Arial", 10)).pack(pady=5)
+                            return
+                        
+                    # If controller supports receiving the email, pass it along.
+                    if self.controller and hasattr(self.controller, "set_user_email"):
+                        try:
+                            self.controller.set_user_email(email)
+                        except Exception:
+                            pass
+                    win.destroy()
+
+                btn_frame = tk.Frame(win)
+                btn_frame.pack(pady=8)
+                tk.Button(btn_frame, text="OK", width=10, command=submit_email).pack(side="left", padx=5)
+                tk.Button(btn_frame, text="Cancel", width=10, command=win.destroy).pack(side="left", padx=5)
+
+                # Make dialog modal
+                win.transient(self.winfo_toplevel())
+                win.grab_set()
+                self.winfo_toplevel().wait_window(win)
                 # target name should match the key used in AppController
                 self.controller.show_frame("FacialStudentPanel")
             except Exception as e:
