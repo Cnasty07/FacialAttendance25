@@ -18,7 +18,7 @@ from PIL import Image, ImageTk
 from src.controllers.databaseController import AttendanceTable, StudentTable
 from src.controllers.facialController import FacialController
 
-from src.controllers import mongooseClient
+# from src.controllers import mongooseClient
 # TODO: Refactor and Change DB to mongo
     ## 1: Refactor this into a proper Tkinter Frame for better integration with AppController
     ## 2: Change database calls to MongoDB later on. (classes already done here)
@@ -34,7 +34,7 @@ class FacialStudentPanel(tk.Frame):
     using `self` as the frame instead of manipulating the parent window.
     """
 
-    def __init__(self, parent, controller=None) -> None:
+    def __init__(self, parent, controller) -> None:
         super().__init__(parent)
         self.parent = parent
         self.controller = controller
@@ -42,9 +42,8 @@ class FacialStudentPanel(tk.Frame):
         self.file_path = ""
 
         # New database connection for remote MongoDB
-        self.remote_db_controller = mongooseClient.RemoteDBC()
-        self.db = self.remote_db_controller.db
-
+        self.db = self.controller.remote
+        
         # Title label (inside this frame)
         self.title_label = Label(
             self, text="Facial Attendance System", font=("Helvetica", 20, "bold"))
@@ -340,9 +339,17 @@ class FacialStudentPanel(tk.Frame):
         self.cap.release()
         self.parent.destroy()
 
+# -- END Facial Attendance Student View (Tkinter Frame) --
 
-if __name__ == "__main__":
+
+# -- Standalone Test Runner --
+def main() -> None:
+    """Run the Facial Student Panel as a standalone application for testing."""
     parent = tk.Tk()
     app = FacialStudentPanel(parent)
     parent.protocol("WM_DELETE_WINDOW", app.close)
     parent.mainloop()
+    
+
+if __name__ == "__main__":
+    main()

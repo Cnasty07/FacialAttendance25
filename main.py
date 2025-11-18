@@ -17,7 +17,6 @@ def activate(app) -> None:
     """
     gpu_detection.is_gpu_available() # Check for GPU availability
 
-
     ## -- Setup Main Application Window --
     app.geometry("800x600")
     app.title("Facial Attendance System")

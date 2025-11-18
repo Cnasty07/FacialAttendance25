@@ -5,9 +5,10 @@ import tkinter as tk
 
 # -- Choose User Panel --
 class ChooseUserPanel(tk.Frame):
-    def __init__(self, parent, controller=None) -> None:
+    def __init__(self, parent, controller) -> None:
         super().__init__(parent)
         self.controller = controller
+        print("Controller: ",self.controller.remote)
         self.built = False
 
     def build_ui(self) -> None:
@@ -59,13 +60,11 @@ class ChooseUserPanel(tk.Frame):
                     email = email_var.get().strip()
                     if email:
                         print("Email entered:", email)
-                        from src.controllers.remoteDatabaseController import remoteController
-                        rmc = remoteController()
-                        student = rmc.get_student(email)
+                        # rmc = self.controller.remote
+                        student = self.controller.get_single_student(email)
                         print(student)
                         if not student:
                             print("No student found with that email.")
-                            # messagebox.showerror("Error", "No student found with that email.")
                             tk.Label(win, text="No student found with that email.", fg="red", font=("Arial", 10)).pack(pady=5)
                             return
                         

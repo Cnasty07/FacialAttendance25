@@ -1,16 +1,23 @@
 import tkinter as tk
 from src import ui
 
+# Testing Adding Variables to Frames and Passing Data Between Frames
+from src.models.User import StudentUserModel, AdminUserModel
+from src.controllers.facialController import FacialController
+from src.controllers.remoteDatabaseController import remoteController
 
+# Controller that is the parent/root of the tkinter gui. Methods to switch frames and fetch data from remote controller.
 
 # TODO: New Frame Switching Mechanism with lazy-loading and on_show hooks. Needs Testing For Functionality.
 
 # -- Application Controller for Frame Management --
 class AppController(tk.Tk):
-    def __init__(self) -> None:
+    def __init__(self, facialController=None, studentModel=None, adminModel=None) -> None:
         super().__init__()
+        self.remote = remoteController()
+
         self.title("Facial Attendance System")
-        
+
         container = tk.Frame(self)
         container.pack(fill="both", expand=True)
         container.grid_rowconfigure(0, weight=1)
@@ -23,27 +30,57 @@ class AppController(tk.Tk):
             (ui.admin_panel.AdminPanel, "AdminPanel"),
             (ui.facial_student_panel.FacialStudentPanel, "FacialStudentPanel"),
         ):
-            # pass controller so panels can call controller.show_frame(...)
             frame = F(container, controller=self)
             self.frames[name] = frame
             frame.grid(row=0, column=0, sticky="nsew")
 
+        # optionally show initial frame
+        self.show_frame("ChooseUserPanel")
+
+    def get_classes(self):
+        """Fetch classes from remote controller and return them (prints for debugging)."""
+        try:
+            classes_list = self.remote.get_all_classes()
+            print("Classes Retrieved:", classes_list)
+            return classes_list
+        except Exception as e:
+            print("Error retrieving classes:", e)
+            return []
+
+    def get_single_student(self, student_email: str):
+        """Fetch student data from remote controller (example function)."""
+        print("Fetching student with email:", student_email)
+        try:
+            student = self.remote.get_student(student_email)
+            print("Student Retrieved:", student)
+            return student
+        except Exception as e:
+            print("Error retrieving student:", e)
+            return None
+
     def show_frame(self, cont):
-        frame = self.frames[cont]
-        if not frame:
-            print(f"Frame {cont} not found!")
-            return
-        frame.tkraise()
         frame = self.frames.get(cont)
         if not frame:
             print(f"Frame {cont} not found!")
             return
         frame.tkraise()
+
         # lazy-build / refresh hook
         if hasattr(frame, "on_show"):
             try:
                 frame.on_show()
             except Exception as e:
                 print(f"Error in on_show for {cont}: {e}")
+
+        # example: automatically refresh classes when showing the AdminPanel
+        if cont == "AdminPanel":
+            # all_classes = self.get_classes()
+            # print("Refreshed: ", all_classes)
+            print("Switched to AdminPanel.")
+
+        if cont == "FacialStudentPanel":
+            # all_classes = self.get_classes()
+            # print("Refreshed: ", all_classes)
+            print("Switched to FacialStudentPanel.")
 
 # -- END Application Controller for Frame Management --
