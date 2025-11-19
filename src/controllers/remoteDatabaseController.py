@@ -13,6 +13,13 @@ class remoteController:
         self.Classes = self.rClient.db.Classes
 
     def get_student(self,student_email: str) -> StudentUserSchema | None:
+        """_summary_
+            Fetch a student from the database by email.
+        Args:
+            student_email (str): _description_
+        Returns:
+            StudentUserSchema | None: _description_
+        """
         try:
             student = self.Student.find_one({"email": student_email})
         except Exception as e:
@@ -20,6 +27,20 @@ class remoteController:
             return None
 
         return student
+
+    def get_all_students(self) -> list[StudentUserSchema]:
+        """_summary_
+            Fetch all students from the database.
+        Returns:
+            list[StudentUserSchema]: _description_
+        """
+        try:
+            students = self.Student.find({})
+        except Exception as e:
+            print("Error fetching students:", e)
+            return []
+        all_students = [stu for stu in students]
+        return all_students
 
     def get_class(self, class_name: str) -> ClassesSchema | None:
         try:
@@ -41,16 +62,7 @@ class remoteController:
 
 
 def main() -> None:
-    rmdbc = remoteController()
-    # print(type(rmdbc.get_student("rreyes@tamusa.edu")))
-    # student: StudentUserSchema = rmdbc.get_student("rreyes@tamusa.edu")
-    # print(student.keys())
-    # # BUG: potential issue with id and _id mapping here. Need to check tomorrow.
-    
-    # from src.models.User import StudentUserModel
-    # studentModel = StudentUserModel.from_mongo(student)
-    # print(studentModel)
-    
+    pass
 
 if __name__ == "__main__":
     main()

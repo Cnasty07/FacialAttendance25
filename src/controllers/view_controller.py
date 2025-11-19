@@ -6,7 +6,7 @@ from src.models.User import StudentUserModel, AdminUserModel
 from src.controllers.facialController import FacialController
 from src.controllers.remoteDatabaseController import remoteController
 
-# Controller that is the parent/root of the tkinter gui. Methods to switch frames and fetch data from remote controller.
+# Controller that is the parent/root of the tkinter GUI. Methods to switch frames and fetch data from remote controller.
 
 # TODO: New Frame Switching Mechanism with lazy-loading and on_show hooks. Needs Testing For Functionality.
 
@@ -14,9 +14,13 @@ from src.controllers.remoteDatabaseController import remoteController
 class AppController(tk.Tk):
     def __init__(self, facialController=None, studentModel=None, adminModel=None) -> None:
         super().__init__()
-        self.remote = remoteController()
+        self.remote = remoteController() # Remote DB Controller Instance
+        self.all_classes = self.remote.get_all_classes() # Pre-fetch classes for initial use
 
+
+        # Setting up main window and container for frames
         self.title("Facial Attendance System")
+        self.geometry("800x600")
 
         container = tk.Frame(self)
         container.pack(fill="both", expand=True)
@@ -47,6 +51,7 @@ class AppController(tk.Tk):
             print("Error retrieving classes:", e)
             return []
 
+    ## --- Student Related Methods --- ##
     def get_single_student(self, student_email: str):
         """Fetch student data from remote controller (example function)."""
         print("Fetching student with email:", student_email)
@@ -57,6 +62,18 @@ class AppController(tk.Tk):
         except Exception as e:
             print("Error retrieving student:", e)
             return None
+
+    # Getting all Students from Student Collection
+    def get_all_students(self):
+        """Fetch all students from remote controller (example function)."""
+        try:
+            students = self.remote.get_all_students()
+            print("Students Retrieved:", students)
+            return students
+        except Exception as e:
+            print("Error retrieving students:", e)
+            return []
+    ## --- END Student Related Methods --- ##
 
     def show_frame(self, cont):
         frame = self.frames.get(cont)
@@ -74,8 +91,7 @@ class AppController(tk.Tk):
 
         # example: automatically refresh classes when showing the AdminPanel
         if cont == "AdminPanel":
-            # all_classes = self.get_classes()
-            # print("Refreshed: ", all_classes)
+            print("Refreshed: ", self.all_classes)
             print("Switched to AdminPanel.")
 
         if cont == "FacialStudentPanel":

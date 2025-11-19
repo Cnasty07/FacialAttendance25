@@ -4,6 +4,7 @@ import threading
 import datetime
 from datetime import datetime
 
+# UI packages
 import tkinter as tk
 from tkinter import ttk
 from tkinter import Label, Button, messagebox
@@ -12,9 +13,7 @@ import pandas as pd
 import cv2
 from PIL import Image, ImageTk
 
-
 # Local Imports
-# from src.controllers.databaseController import ClassTable, AttendanceTable, StudentTable, FaceTable
 from src.controllers.databaseController import AttendanceTable, StudentTable
 from src.controllers.facialController import FacialController
 
@@ -72,7 +71,7 @@ class FacialStudentPanel(tk.Frame):
         # Loading Class Names from remote now
         try:
             classes_list = []
-            for classes in self.db.Classes.find():
+            for classes in self.controller.all_classes:
                 classes_list.append(classes)
         except Exception as e:
             print(f"An error occurred loading classes: {e}")

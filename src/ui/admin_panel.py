@@ -1,5 +1,8 @@
 import os
+from time import time
 import tkinter as tk
+
+from build.lib.src.models.User import StudentUserModel
 
 # TODO: Implement Admin Panel functionality
     # 1. Need to get and show all classes
@@ -7,7 +10,7 @@ import tkinter as tk
     # 3. Need to implement adding/removing students and classes
 
 class AdminPanel(tk.Frame):
-    def __init__(self, parent, controller=None) -> None:
+    def __init__(self, parent, controller) -> None:
         super().__init__(parent)
         self.controller = controller
         self.built = False
@@ -24,6 +27,14 @@ class AdminPanel(tk.Frame):
                   width=50, height=2, font=("Arial", 14)).pack(pady=10)
         self.built = True
 
+        # Display List of Classes in raw format
+        classes_list = tk.Text(self, height=100, width=100,
+                bg="grey", font=("Arial", 12), fg="white")
+        for clss in self.controller.all_classes:
+            classes_list.insert(tk.END, f"_id: {clss['_id']} : [{clss['course_code']} : {clss['name']}, Start time: {clss['start_time'].time()} : End time {clss['end_time'].time()}]\n")
+        classes_list.pack(fill="both", pady=20, expand=True)
+
+
     def on_show(self) -> None:
         """Called by the controller when this frame is shown."""
         if not self.built:
@@ -32,19 +43,19 @@ class AdminPanel(tk.Frame):
         # self.refresh()
 
     def manage_users(self) -> None:
-        # Replace with db.StudentTable().read_all()
-        users = ["Chris", "Ruben", "Alice", "Bob"]
+        users = self.controller.get_all_students()
         win = tk.Toplevel(self)
         win.title("Manage Users")
         win.geometry("300x300")
         user_list = tk.Listbox(win)
         for user in users:
-            user_list.insert(tk.END, user)
+            user_list.insert(tk.END, user['name'])
         user_list.pack(fill="both", expand=True, padx=10, pady=10)
 
     def view_reports(self) -> None:
         # Implement report viewing (open new window or populate this frame)
         pass
+
 
     def close(self) -> None:
         """Clean up resources when the application is closed."""
