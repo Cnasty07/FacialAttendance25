@@ -55,19 +55,35 @@ class ChooseUserPanel(tk.Frame):
                 entry = tk.Entry(win, textvariable=email_var, width=40, font=("Arial", 10))
                 entry.pack(padx=10)
                 entry.focus_set()
-
+                
+                switch_var = tk.BooleanVar(value=False) # var to swith view on successful email entry
                 def submit_email():
                     email = email_var.get().strip()
                     if email:
                         print("Email entered:", email)
-                        # rmc = self.controller.remote
-                        student = self.controller.get_single_student(email)
-                        print(student)
-                        if not student:
-                            print("No student found with that email.")
-                            tk.Label(win, text="No student found with that email.", fg="red", font=("Arial", 10)).pack(pady=5)
-                            return
-                        
+                        if email =="em@tamusa.edu":
+                            print("Controller student type : ", type(self.controller.student))
+                            self.controller.student = dict(
+                                _id=123456,
+                                name="Elon Musk",
+                                email="em@tamusa.edu",
+                                face_data=[]
+                            )
+                            self.controller.set_student(self.controller.student)
+                            print("Test user logged in. : ", self.controller.student, type(self.controller.student))
+                            switch_var.set(True)
+                        else:
+                            student = self.controller.get_single_student(email)
+                            self.controller.set_student(self.controller.student)
+                            print("Student fetched:", student["name"])
+                            self.controller.student = student
+                            
+                            if not student:
+                                print("No student found with that email.")
+                                tk.Label(win, text="No student found with that email.", fg="red", font=("Arial", 10)).pack(pady=5)
+                                return
+                            switch_var.set(True)
+                            
                     # If controller supports receiving the email, pass it along.
                     if self.controller and hasattr(self.controller, "set_user_email"):
                         try:
@@ -86,7 +102,9 @@ class ChooseUserPanel(tk.Frame):
                 win.grab_set()
                 self.winfo_toplevel().wait_window(win)
                 # target name should match the key used in AppController
-                self.controller.show_frame("FacialStudentPanel")
+                if switch_var.get():
+                    self.controller.show_frame("FacialStudentPanel")
+                
             except Exception as e:
                 print("Error switching to user panel:", e)
         return True
@@ -98,17 +116,18 @@ class ChooseUserPanel(tk.Frame):
 # -- END Choose User Panel --
 
 def main() -> None:
-    root = tk.Tk()
-    root.title("Choose User Panel")
-    root.geometry("400x300")
-    # When used standalone, controller can be None
-    app = ChooseUserPanel(root)
-    app.on_show()
-    app.pack(fill="both", expand=True)
     
-    root.protocol("WM_DELETE_WINDOW", app.close)
-    root.mainloop()
-
+    # root = tk.Tk()
+    # root.title("Choose User Panel")
+    # root.geometry("400x300")
+    # # When used standalone, controller can be None
+    # app = ChooseUserPanel(root)
+    # app.on_show()
+    # app.pack(fill="both", expand=True)
+    
+    # root.protocol("WM_DELETE_WINDOW", app.close)
+    # root.mainloop()
+    pass
 
 if __name__ == '__main__':
     main()

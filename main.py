@@ -3,6 +3,7 @@ import sys
 
 from utils import gpu_detection
 from src.controllers.view_controller import AppController
+from src.controllers.remoteDatabaseController import remoteController
 
 
 # TODO: Finish Entry to application
@@ -42,7 +43,7 @@ def main() -> None:
     print("Current working directory: ", sys.path[0])
     
     ## Starts the application controller for frame switching and user interface management.
-    app = AppController()
+    app = AppController(remoteClient=remoteController())
     activate(app)
 
 if __name__ == '__main__':

@@ -61,10 +61,6 @@ A Python-based facial recognition system for managing and recording student atte
 
 ```
 
-## Programming Languages
-
-INSERT ITEMS HERE FOR PL
-
 ### Project Structure
 
 ``` python
@@ -74,20 +70,15 @@ INSERT ITEMS HERE FOR PL
 ├── README.md
 ├── components
 │   ├── __init__.py
-│   ├── __pycache__
 │   ├── capture.py
 │   ├── comparison.py
 │   └── recognition.py
 ├── controllers
 │   ├── __init__.py
-│   ├── __pycache__
 │   ├── databaseController.py
 │   └── facialController.py
 ├── database
 │   ├── __init__.py
-│   ├── __pycache__
-│   │   ├── __init__.cpython-312.pyc
-│   │   └── __init__.cpython-313.pyc
 │   ├── recordsController.py
 │   ├── schema.sql
 │   ├── school.db
@@ -103,10 +94,14 @@ INSERT ITEMS HERE FOR PL
 │       └── ruben2.jpg
 ├── main.py
 ├── setup.py
-├── test_db_data.py
-├── tests_facial.py
+└── tests
+│   └── test_db_data.py
+│   ├── test_remote_db.py
+│   └── test_facial.py
+│   └── test_model_db.py
 └── ui
-    ├── __init__.py
-    ├── __pycache__
-    └── new_interface.py
+│   ├── __init__.py
+│   └── admin_panel.py
+│   └── choose_user_panel.py
+│   └── facial_student_panel.py
 ```

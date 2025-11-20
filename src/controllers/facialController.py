@@ -6,9 +6,8 @@ import pandas
 import src.components.capture as cap
 import src.components.comparison as comp
 import src.components.recognition as rec
-import src.controllers.databaseController as db
 
-from typing import Optional
+from typing import Optional , List
 
 
 # FacialController Flow:
@@ -35,20 +34,30 @@ class FacialController:
         self.known_faces = self.load_known_faces()
         # pass
 
+    # TODO : Check with real camera capture later and not test user.
     @staticmethod
-    def load_known_faces() -> pandas.Series:
+    def load_known_faces(student) -> List[np.ndarray]:
         """_summary_
             Loads the known faces from the database.
         Returns:
-            pandas.Series: _description_
+            List[np.ndarray]: returns a list of known faces as numpy arrays.
         """
-        student_table = db.StudentTable().read()
-        known_faces = student_table.set_index('id')['face_encodings']
-        for index, face_encoding in known_faces.items():
-            known_faces.at[index] = np.array(face_encoding)
-        print(known_faces[known_faces.index == 11])
-        print("zero value: ", type(known_faces.values[0]))
 
+        known_faces = []
+
+        # Inserting test known faces for Elon Musk Test User
+        if student['name'] == "Elon Musk":
+            import sys
+            sys.path.append(os.path.relpath("../../"))
+            print("Current Directory: ", os.getcwd())
+            print("Loaded Known Faces for Elon Musk: ", rec.FacialRecognition.get_face_encoding("database/tests/Musk3.jpg"), type(known_faces))
+            known_faces.append(
+                rec.FacialRecognition.get_face_encoding("./database/tests/Musk3.jpg"))
+        print ("Known Faces Loaded: ", known_faces)
+
+        # Loading known faces from student face_data
+        for face in student['face_data']:
+            known_faces.append(np.array(face))
         return known_faces
 
     # -- not using this method yet --

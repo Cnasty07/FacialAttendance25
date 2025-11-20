@@ -107,8 +107,8 @@ class StudentUserSchema(Schema):
     schema_name = "Student"
 
     id = None
-    name = None
-    email = None
+    name = str
+    email = str
     face_data = None
     
     def __init__(self, **kwargs):

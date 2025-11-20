@@ -1,17 +1,18 @@
 from src.models.User import StudentUserSchema
 from src.models.Classes import ClassesSchema
 
-from src.controllers.mongooseClient import RemoteDBC
+from src.controllers.mongooseClient import mongoose_init
 
 # TODO: Finish using this controller for remote DB operations
 
 class remoteController:
     def __init__(self) -> None:
-        self.rClient = RemoteDBC() # Initialize remote DB connection
+        self.rClient = mongoose_init()  # Initialize remote DB connection
+        # self.rClient = self.mongoClient() # Initialize remote DB connection
         self.Student = self.rClient.db.Student
         self.Classes = self.rClient.db.Classes
 
-    def get_student(self,student_email: str) -> StudentUserSchema | None:
+    def get_student(self, student_email: str) -> StudentUserSchema | None:
         """_summary_
             Fetch a student from the database by email.
         Args:
@@ -38,7 +39,7 @@ class remoteController:
         """
         try:
             students = self.Student.find({})
-            # TODO: Fix Parsing
+            # TODO: Fix Parsing for admin panel
             # for student in students:
             #     student = StudentUserSchema.parse(student)
             #     print("Fetched Student:", student)
@@ -54,7 +55,7 @@ class remoteController:
         except Exception as e:
             print("Error fetching class:", e)
             return None
-        
+
         return classes
 
     def get_all_classes(self) -> list[ClassesSchema]:
@@ -69,6 +70,7 @@ class remoteController:
 
 def main() -> None:
     pass
+
 
 if __name__ == "__main__":
     main()

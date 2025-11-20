@@ -2,7 +2,7 @@ import tkinter as tk
 from src import ui
 
 # Testing Adding Variables to Frames and Passing Data Between Frames
-from src.models.User import StudentUserModel, AdminUserModel
+from src.models.User import StudentUserModel, AdminUserModel , StudentUserSchema
 from src.controllers.facialController import FacialController
 from src.controllers.remoteDatabaseController import remoteController
 
@@ -12,13 +12,13 @@ from src.controllers.remoteDatabaseController import remoteController
 
 # -- Application Controller for Frame Management --
 class AppController(tk.Tk):
-    def __init__(self, facialController=None, studentModel=None, adminModel=None) -> None:
+    def __init__(self, remoteClient: remoteController, facialController=None, studentModel=None, adminModel=None) -> None:
         super().__init__()
         # Initialize Local Scripts & Models
-        self.remote = remoteController() # Remote DB Controller Instance
+        self.remote = remoteClient # Remote DB Controller Instance
         self.all_classes = self.remote.get_all_classes() # Pre-fetch classes for initial use
-        self.student = StudentUserModel if studentModel is None else studentModel
-        self.admin = AdminUserModel if adminModel is None else adminModel
+        self.student = StudentUserSchema 
+        self.admin = AdminUserModel
         
 
         # Setting up main window and container for frames
@@ -77,17 +77,39 @@ class AppController(tk.Tk):
         except Exception as e:
             print("Error retrieving students:", e)
             return []
-    
-    def confirm_attendance(self):
-        """Confirm attendance for a student (example function)."""
+
+    # Setting the current student in the controller
+    def set_student(self, student: StudentUserSchema):
+        """Set the current student (example function)."""
+        self.student = student
+        print("Current student set to:", self.student)
+
+    # Loading student data into the application
+    def load_student(self):
+        """Load student data into the application (example function)."""
         try:
-            # result = self.remote.update_one({"email": self.student["email"]}, {"$set": {"face_data": True}}) 
+            if not self.student:
+                print("No student set to load.")
+                return None
+            # Simulate loading student data
+            return self.student
+        except Exception as e:
+            print("Error loading student data:", e)
+            return None
+
+    def confirm_attendance_update(self):
+        """Confirm attendance for a student (example function)."""
+        print("Confirming attendance for student:", self.student)
+        try:
+            result = self.remote.Student.update_one({"email": self.student["email"]}, {"$set": {"face_data": self.student["face_data"]}}) 
             print("Attendance Confirmed:", self.student)
+            print("Update Result:", result)
             # return result
             return True
         except Exception as e:
             print("Error confirming attendance:", e)
             return None
+
     ## --- END Student Related Methods --- ##
 
     def show_frame(self, cont):
@@ -106,12 +128,9 @@ class AppController(tk.Tk):
 
         # example: automatically refresh classes when showing the AdminPanel
         if cont == "AdminPanel":
-            print("Refreshed: ", self.all_classes)
             print("Switched to AdminPanel.")
 
         if cont == "FacialStudentPanel":
-            # all_classes = self.get_classes()
-            # print("Refreshed: ", all_classes)
             print("Switched to FacialStudentPanel.")
 
 # -- END Application Controller for Frame Management --
