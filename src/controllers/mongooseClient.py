@@ -11,7 +11,7 @@ from src.models.Classes import ClassesSchema
 # TODO: Rename to better reflect remote DB usage
 class RemoteDBC:
     def __init__(self) -> None:
-        self.client = MongoClient(os.getenv("MONGO_URI"))
+        self.client = MongoClient(os.getenv("MONGO_URI"),tls=True,tlsAllowInvalidCertificates=True) # Temporary fix while working on capture 
         self.db = self.client.EmbeddedAppData
         try:
             schemas = {

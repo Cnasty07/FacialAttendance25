@@ -14,9 +14,12 @@ from src.controllers.remoteDatabaseController import remoteController
 class AppController(tk.Tk):
     def __init__(self, facialController=None, studentModel=None, adminModel=None) -> None:
         super().__init__()
+        # Initialize Local Scripts & Models
         self.remote = remoteController() # Remote DB Controller Instance
         self.all_classes = self.remote.get_all_classes() # Pre-fetch classes for initial use
-
+        self.student = StudentUserModel if studentModel is None else studentModel
+        self.admin = AdminUserModel if adminModel is None else adminModel
+        
 
         # Setting up main window and container for frames
         self.title("Facial Attendance System")
@@ -57,6 +60,7 @@ class AppController(tk.Tk):
         print("Fetching student with email:", student_email)
         try:
             student = self.remote.get_student(student_email)
+            self.student = student  # Store retrieved student
             print("Student Retrieved:", student)
             return student
         except Exception as e:
@@ -73,6 +77,17 @@ class AppController(tk.Tk):
         except Exception as e:
             print("Error retrieving students:", e)
             return []
+    
+    def confirm_attendance(self):
+        """Confirm attendance for a student (example function)."""
+        try:
+            # result = self.remote.update_one({"email": self.student["email"]}, {"$set": {"face_data": True}}) 
+            print("Attendance Confirmed:", self.student)
+            # return result
+            return True
+        except Exception as e:
+            print("Error confirming attendance:", e)
+            return None
     ## --- END Student Related Methods --- ##
 
     def show_frame(self, cont):

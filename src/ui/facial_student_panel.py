@@ -88,12 +88,13 @@ class FacialStudentPanel(tk.Frame):
 
         # Camera feed frame (Label used to hold image)
         self.camera_frame = Label(self, width=200, height=400)
-        self.camera_frame.pack(pady=10, expand=False, fill="both")
+        self.camera_frame.pack(pady=10, expand=True, fill="both")
         
         # Input field for student name
         self.input_label = Label(
-            self, text="Enter Student Name:", font=("Helvetica", 14))
+            self, text="Current Student Name", font=("Helvetica", 14))
         self.input_label.pack(pady=5)
+        # deleting soon
         self.input_entry = tk.Entry(self, font=("Helvetica", 14))
         self.input_entry.pack(pady=5)
 
@@ -102,27 +103,77 @@ class FacialStudentPanel(tk.Frame):
             "Helvetica", 14), command=self.record_attendance)
         self.record_button.pack(pady=10)
 
+
+        # Update Student Face Data Button
+        self.update_face_button = Button(self, text="Update Face Data", font=(
+            "Helvetica", 14), command=self.update_face_data)
+        self.update_face_button.pack(pady=10)
+        
+        
+        # Removed Search Functionality for now
         # Search section
-        self.search_label = Label(
-            self, text="Search Attendance Records:", font=("Helvetica", 14))
-        self.search_label.pack(pady=5)
-        self.search_entry = tk.Entry(self, font=("Helvetica", 14))
-        self.search_entry.pack(pady=5)
+        # self.search_label = Label(
+        #     self, text="Search Attendance Records:", font=("Helvetica", 14))
+        # self.search_label.pack(pady=5)
+        # self.search_entry = tk.Entry(self, font=("Helvetica", 14))
+        # self.search_entry.pack(pady=5)
 
         # Search buttons
-        self.search_student_button = Button(self, text="Search Student", font=(
-            "Helvetica", 14), command=self.search_student)
-        self.search_student_button.pack(pady=5)
+        # self.search_student_button = Button(self, text="Search Student", font=(
+        #     "Helvetica", 14), command=self.search_student)
+        # self.search_student_button.pack(pady=5)
 
-        self.search_date_button = Button(self, text="Search Date", font=(
-            "Helvetica", 14), command=self.search_date)
-        self.search_date_button.pack(pady=5)
+        # self.search_date_button = Button(self, text="Search Date", font=(
+        #     "Helvetica", 14), command=self.search_date)
+        # self.search_date_button.pack(pady=5)
 
         # Camera
         self.cap = cv2.VideoCapture(0)
         self.running = True
         # Start camera updates
         self.after(10, self.update_camera)
+
+
+    # -- Update Face Data --
+    def update_face_data(self) -> None:
+        """Update the face data for the student in the database."""
+        student_name = self.input_entry.get()
+        if not student_name:
+            messagebox.showerror(
+                "Error", "Please enter a student name to update face data.")
+            return
+
+        ret, frame = self.cap.read()
+        if not ret:
+            print("Failed to capture frame from camera.")
+            return
+
+        # Face detection
+        gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        face_cascade = cv2.CascadeClassifier(
+            cv2.data.haarcascades + "haarcascade_frontalface_default.xml")
+        faces = face_cascade.detectMultiScale(
+            gray_frame, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
+
+        if len(faces) == 0:
+            print("No face detected. Please try again.")
+            return
+
+        # Process the first detected face
+        for (x, y, w, h) in faces:
+            face_roi = frame[y:y + h, x:x + w]
+            break  # Only process the first face
+
+        # Save the face ROI
+        now = datetime.now()
+        timestamp = now.strftime("%Y%m%d_%H%M%S")
+        face_path = f'./database/tests/updated_face_{timestamp}.jpg'
+        cv2.imwrite(face_path, face_roi)
+        print(f"Face captured and saved to {face_path}")
+
+        # Here you would add code to update the student's face data in the database
+        messagebox.showinfo(
+            "Success", f"Face data for {student_name} has been updated.")
 
     # -- Search by Student Name --
     def search_student(self) -> None:
@@ -252,23 +303,20 @@ class FacialStudentPanel(tk.Frame):
             current_time = datetime.now()
             formatted_time = current_time.strftime("%Y-%m-%d %H:%M:%S")
 
+            ## TODO: Need to move this over to MongoDB studentusermodel face_data
             if is_match:
-                student_table_class = StudentTable("./database/school.db")
-                Student_table = student_table_class.read()
                 try:
-                    student_record = Student_table.loc[Student_table['id']
-                                                       == student_id]
+                    confirm_student = self.controller.confirm_attendance()
+                    print("Attendance confirmed:", confirm_student)
                 except Exception as e:
                     print(f"Student not found:  {e}")
                     student_id = math.randomInt(20, 100)
 
                 if student_record:
-                    student_id = student_record['id']
+                    student_id = student_record['_id']
                     print(student_id)
-                    AttendanceTable(
-                        "./database/school.db").create(student_id, class_name, formatted_time)
-                    message = (
-                        f"Successfully recorded student {student_name} " f"on {formatted_time} for class {class_name}.")
+                    # Record attendance
+                    
                 else:
 
                     new_student = student_table_class.create(

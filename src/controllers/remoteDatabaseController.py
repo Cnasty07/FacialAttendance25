@@ -1,4 +1,3 @@
-
 from src.models.User import StudentUserSchema
 from src.models.Classes import ClassesSchema
 
@@ -22,6 +21,9 @@ class remoteController:
         """
         try:
             student = self.Student.find_one({"email": student_email})
+            # TODO: Fix parsing
+            # student = StudentUserSchema.parse(student)
+            # print("Fetched Student:", student)
         except Exception as e:
             print("Error fetching student:", e)
             return None
@@ -36,6 +38,10 @@ class remoteController:
         """
         try:
             students = self.Student.find({})
+            # TODO: Fix Parsing
+            # for student in students:
+            #     student = StudentUserSchema.parse(student)
+            #     print("Fetched Student:", student)
         except Exception as e:
             print("Error fetching students:", e)
             return []
