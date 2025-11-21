@@ -53,9 +53,9 @@ class FacialController:
             print("Loaded Known Faces for Elon Musk: ", rec.FacialRecognition.get_face_encoding("database/tests/Musk3.jpg"), type(known_faces))
             known_faces.append(
                 rec.FacialRecognition.get_face_encoding("./database/tests/Musk3.jpg"))
-        # FIXME: Come back later to make sure it works
-        for face in student['face_data']:
-            known_faces.append(np.array(face))
+        else:# FIXME: Come back later to make sure it works
+            for face in student['face_data']:
+                known_faces.append(np.array(face))
         print ("Known Faces Loaded: ", known_faces)
 
         # Loading known faces from student face_data
