@@ -31,7 +31,7 @@ class FacialController:
 
     def __init__(self, class_id: Optional[int] = None) -> None:
         self.class_id = class_id
-        self.known_faces = self.load_known_faces()
+        # self.known_faces = self.load_known_faces()
         # pass
 
     # TODO : Check with real camera capture later and not test user.
@@ -46,13 +46,16 @@ class FacialController:
         known_faces = []
 
         # Inserting test known faces for Elon Musk Test User
-        if student['name'] == "Elon Musk":
+        if student['name'] == "Elon Musk" and student["face_data"] == []:
             import sys
             sys.path.append(os.path.relpath("../../"))
             print("Current Directory: ", os.getcwd())
             print("Loaded Known Faces for Elon Musk: ", rec.FacialRecognition.get_face_encoding("database/tests/Musk3.jpg"), type(known_faces))
             known_faces.append(
                 rec.FacialRecognition.get_face_encoding("./database/tests/Musk3.jpg"))
+        # FIXME: Come back later to make sure it works
+        for face in student['face_data']:
+            known_faces.append(np.array(face))
         print ("Known Faces Loaded: ", known_faces)
 
         # Loading known faces from student face_data
