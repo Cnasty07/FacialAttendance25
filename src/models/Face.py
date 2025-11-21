@@ -26,12 +26,28 @@ class FaceDataSchema(Schema):
     schema_name = "FaceData"
 
     id = None
+    student_id = None
+    class_id = None
     encoding = None
 
     def __init__(self, **kwargs):
         self.schema = {
+            "student_id": [{
+                "type": Types.ObjectId,
+                "ref": "StudentUser",
+                "required": True,
+            }],
+            "class_id": [{
+                "type": Types.ObjectId,
+                "ref": "Classes",
+                "required": True,
+            }],
             "encoding": [{
-                "type": Types.Number,
+                "type": Types.ObjectId,
+                "face_data": {
+                    "type": Types.Number,
+                },
+                "required": True,
             }]
         }
         super().__init__(self.schema_name, self.schema, kwargs)
@@ -43,7 +59,12 @@ class FaceDataSchema(Schema):
 
 
 def main():
-    pass
+    FDS = FaceDataSchema(
+        student_id=bson.ObjectId(),
+        class_id=bson.ObjectId(),
+        encoding= { bson.ObjectId(): [0.1, 0.2, 0.3] }
+    )
+    print(FDS.student_id, FDS.class_id, FDS.encoding)
 
 if __name__ == "__main__":
     main()

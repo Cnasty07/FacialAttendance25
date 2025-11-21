@@ -2,7 +2,10 @@ import tkinter as tk
 from src import ui
 
 # Testing Adding Variables to Frames and Passing Data Between Frames
-from src.models.User import StudentUserModel, AdminUserModel , StudentUserSchema
+from src.models.User import AdminUserModel , StudentUserSchema
+from src.models.Classes import ClassesSchema
+from typing import Any
+
 from src.controllers.facialController import FacialController
 from src.controllers.remoteDatabaseController import remoteController
 
@@ -12,19 +15,20 @@ from src.controllers.remoteDatabaseController import remoteController
 
 # -- Application Controller for Frame Management --
 class AppController(tk.Tk):
-    def __init__(self, remoteClient: remoteController, facialController=None, studentModel=None, adminModel=None) -> None:
+    def __init__(self, remoteClient: remoteController) -> None:
         super().__init__()
         # Initialize Local Scripts & Models
-        self.remote = remoteClient # Remote DB Controller Instance
-        self.all_classes = self.remote.get_all_classes() # Pre-fetch classes for initial use
-        self.student = StudentUserSchema 
-        self.admin = AdminUserModel
-        
+        self.remote: remoteController = remoteClient # Remote DB Controller Instance
+        self.all_classes: list[ClassesSchema] = self.remote.get_all_classes() # Pre-fetch classes for initial use
+        self.all_students: list[StudentUserSchema] = self.remote.get_all_students() # Pre-fetch students for initial use
+        self.student: StudentUserSchema = StudentUserSchema()
+        # self.admin = AdminUserModel
 
         # Setting up main window and container for frames
         self.title("Facial Attendance System")
         self.geometry("800x600")
 
+        # Container for all frames
         container = tk.Frame(self)
         container.pack(fill="both", expand=True)
         container.grid_rowconfigure(0, weight=1)
@@ -44,18 +48,8 @@ class AppController(tk.Tk):
         # optionally show initial frame
         self.show_frame("ChooseUserPanel")
 
-    def get_classes(self):
-        """Fetch classes from remote controller and return them (prints for debugging)."""
-        try:
-            classes_list = self.remote.get_all_classes()
-            print("Classes Retrieved:", classes_list)
-            return classes_list
-        except Exception as e:
-            print("Error retrieving classes:", e)
-            return []
-
     ## --- Student Related Methods --- ##
-    def get_single_student(self, student_email: str):
+    def get_single_student(self, student_email: str) -> StudentUserSchema | None:
         """Fetch student data from remote controller (example function)."""
         print("Fetching student with email:", student_email)
         try:
@@ -66,17 +60,6 @@ class AppController(tk.Tk):
         except Exception as e:
             print("Error retrieving student:", e)
             return None
-
-    # Getting all Students from Student Collection
-    def get_all_students(self):
-        """Fetch all students from remote controller (example function)."""
-        try:
-            students = self.remote.get_all_students()
-            print("Students Retrieved:", students)
-            return students
-        except Exception as e:
-            print("Error retrieving students:", e)
-            return []
 
     # Setting the current student in the controller
     def set_student(self, student: StudentUserSchema):
@@ -95,19 +78,6 @@ class AppController(tk.Tk):
             return self.student
         except Exception as e:
             print("Error loading student data:", e)
-            return None
-
-    def confirm_attendance_update(self):
-        """Confirm attendance for a student (example function)."""
-        print("Confirming attendance for student:", self.student)
-        try:
-            result = self.remote.Student.update_one({"email": self.student["email"]}, {"$set": {"face_data": self.student["face_data"]}}) 
-            print("Attendance Confirmed:", self.student)
-            print("Update Result:", result)
-            # return result
-            return True
-        except Exception as e:
-            print("Error confirming attendance:", e)
             return None
 
     ## --- END Student Related Methods --- ##

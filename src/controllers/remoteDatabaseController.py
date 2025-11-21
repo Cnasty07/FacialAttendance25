@@ -39,10 +39,6 @@ class remoteController:
         """
         try:
             students = self.Student.find({})
-            # TODO: Fix Parsing for admin panel
-            # for student in students:
-            #     student = StudentUserSchema.parse(student)
-            #     print("Fetched Student:", student)
         except Exception as e:
             print("Error fetching students:", e)
             return []

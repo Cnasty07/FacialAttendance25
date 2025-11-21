@@ -1,5 +1,4 @@
 # Facial Student Panel UI using Tkinter
-import math
 import threading
 import datetime
 from datetime import datetime
@@ -9,22 +8,25 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import Label, Button, messagebox
 
-import pandas as pd
+# import pandas as pd
 import cv2
 from PIL import Image, ImageTk
 
 # Local Imports
-from src.controllers.databaseController import AttendanceTable, StudentTable
+# from src.controllers.databaseController import AttendanceTable, StudentTable
 from src.controllers.facialController import FacialController
+from src.models.User import StudentUserSchema
 
 # from src.controllers import mongooseClient
 # TODO: Refactor and Change DB to mongo
-    ## 1: Refactor this into a proper Tkinter Frame for better integration with AppController
-    ## 2: Change database calls to MongoDB later on. (classes already done here)
-        ## 1. Load face_data from MongoDB instead of local SQLite
-        ## 2. Load attendance data from MongoDB instead of local SQLite
+# 1: Refactor this into a proper Tkinter Frame for better integration with AppController
+# 2: Change database calls to MongoDB later on. (classes already done here)
+# 1. Load face_data from MongoDB instead of local SQLite
+# 2. Load attendance data from MongoDB instead of local SQLite
 
 # --- Facial Attendance Student View (Tkinter Frame) ---
+
+
 class FacialStudentPanel(tk.Frame):
     """Tkinter Frame for Facial Attendance Student Panel UI.
     """
@@ -35,12 +37,14 @@ class FacialStudentPanel(tk.Frame):
         self.controller = controller
         # New database connection for remote MongoDB
         # self.db = self.controller.remote
-        
+
         # Title label (inside this frame)
         self.title_label = Label(
             self, text="Facial Attendance System", font=("Helvetica", 20, "bold"))
         self.title_label.pack(pady=10)
 
+        self.configure(bg="lightblue")
+        
         # Initialize facial controller (may be stateful)
         try:
             self.fc = FacialController()
@@ -48,11 +52,10 @@ class FacialStudentPanel(tk.Frame):
             # Fallback to static usage if FacialController only exposes staticmethods
             self.fc = FacialController
 
-
         def on_select(event):
             _ = self.class_list.get()
             print(f"Selected class: {_}")
-            ## searching for data for class
+            # searching for data for class
             for classes in self.controller.remote.Classes.find():
                 if classes['name'] == _:
                     print(f"Found class data: {classes}")
@@ -69,7 +72,8 @@ class FacialStudentPanel(tk.Frame):
             classes_list = []
 
         # Extract class names shows as "course_code : name"
-        class_names = [f"{cls['course_code']} : {cls['name']}" for cls in classes_list]
+        class_names = [
+            f"{cls['course_code']} : {cls['name']}" for cls in classes_list]
 
         # Class selection combobox
         self.class_list = ttk.Combobox(self)
@@ -82,21 +86,19 @@ class FacialStudentPanel(tk.Frame):
         self.camera_frame = Label(self, width=200, height=400)
         self.camera_frame.pack(pady=10, expand=True, fill="both")
 
-        
         # Input field for student name
         self.input_label = Label(
             self, text="Current Student Name", font=("Helvetica", 14))
-        self.input_label.pack(pady=5)
-        
+        self.input_label.pack(pady=5, side="left")
+
         self.name_label = Label(
             self, text="student name", font=("Helvetica", 14))
-        self.name_label.pack(pady=5)
+        self.name_label.pack(pady=5, side="right", after=self.input_label)
 
         # Record attendance button
         self.record_button = Button(self, text="Record Attendance", font=(
             "Helvetica", 14), command=self.record_attendance)
         self.record_button.pack(pady=10)
-
 
         # Update Student Face Data Button
         self.update_face_button = Button(self, text="Update Face Data", font=(
@@ -119,6 +121,9 @@ class FacialStudentPanel(tk.Frame):
             self.after(10, self.update_camera)
 
     def on_show(self) -> None:
+        """_summary_
+            Hook called when this frame is shown.
+        """
         try:
             self.student = self.controller.load_student()
             print("FacialStudentPanel on_show loaded student: ", self.student)
@@ -131,14 +136,15 @@ class FacialStudentPanel(tk.Frame):
                 "Helvetica", 14), command=self.test_confirm_attendance)
             self.confirm_button.pack(pady=10)
 
+    # -- Test Confirm Attendance --
     def test_confirm_attendance(self):
-        self.confirm_attendance(student_name=self.student['name'], class_name="Test Class", face_path="./database/tests/MuskComp.jpg")
+        self.confirm_attendance(
+            student_name=self.student['name'], class_name=self.class_list.get(), face_path="./database/tests/MuskComp.jpg")
         print("Test confirm attendance executed.")
 
     # -- Update Face Data --
     def update_face_data(self) -> None:
         """Update the face data for the student in the database."""
-        # student_name = self.input_entry.get()
         student_name = self.student['name']
         print(student_name)
         if not student_name:
@@ -178,39 +184,6 @@ class FacialStudentPanel(tk.Frame):
         messagebox.showinfo(
             "Success", f"Face data for {student_name} has been updated.")
 
-    # -- Display Results in Popup --
-    def display_results(self, records) -> None:
-        """Display the queried records in a popup window."""
-        if records.empty:
-            messagebox.showinfo(
-                "No Results", "No records found for the given query.")
-            return
-
-        result_window = tk.Toplevel(self.parent)
-        result_window.title("Search Results")
-        result_window.geometry("600x400")
-
-        tree = ttk.Treeview(result_window)
-        tree["columns"] = list(records.columns)
-        tree["show"] = "headings"
-
-        for col in records.columns:
-            tree.heading(col, text=col)
-            tree.column(col, anchor="center")
-
-        for _, row in records.iterrows():
-            tree.insert("", "end", values=list(row))
-
-        tree.pack(fill="both", expand=True)
-        close_button = Button(result_window, text="Close",
-                              command=result_window.destroy)
-        close_button.pack(pady=10)
-
-        # Initialize camera and thread
-        self.cap = cv2.VideoCapture(0)  # Open the default camera
-        self.running = True
-        self.update_camera()
-
     # -- Update Camera Feed --
     def update_camera(self) -> None:
         """Update the camera feed in the GUI with optional face detection."""
@@ -240,17 +213,23 @@ class FacialStudentPanel(tk.Frame):
                 Returns:
                 None
         """
-
+        message = ""
+        # Process and Match Face
         try:
-            # Process and match face loads image and gets encoding
             unknown_face = self.fc.process_image(face_path)
             print("Unknown Face Encoding: ", unknown_face, type(unknown_face))
-            # retrieves the known faces from the database, with id as index
+            # Loads known faces from the student face_data
             try:
-                load_known_faces = self.fc.load_known_faces(student=self.student)
-                # collects only the face encodings
-                # known_encodings = [face_encoding for face_encoding in load_known_faces]
-                known_encodings = [face_encoding for face_encoding in load_known_faces]
+                load_known_faces = self.fc.load_known_faces(
+                    student=self.student)
+                if self.student['email'] == "em@tamusa.edu" and self.student["face_data"] == []:
+                    for face in load_known_faces:
+                        print("Adding initial face data for test user.")
+                        self.student['face_data'].append(face.tolist())
+                    # self.controller.set_student(self.student)
+                # filters out only the encodings
+                known_encodings = [
+                    face_encoding for face_encoding in load_known_faces]
                 # Compare the unknown face to the known faces
                 is_match = self.fc.match_processed_image(
                     unknown_face, known_encodings)
@@ -260,37 +239,37 @@ class FacialStudentPanel(tk.Frame):
                 print("No match found.")
                 student_id = None
 
-            # Compare the unknown face to the known faces
-            # is_match = FacialController.match_processed_image(unknown_face, known_encodings)
-
             # Generate current date and time
             current_time = datetime.now()
             formatted_time = current_time.strftime("%Y-%m-%d %H:%M:%S")
 
-            ## TODO: WIP moving to mongo db 
+            # If match found, record attendance in MongoDB
             if is_match:
                 try:
-                    self.student['face_data'].append(unknown_face)
-                    self.controller.set_student(self.student)
+                    self.student['face_data'].append(unknown_face.tolist())
+                    # self.controller.set_student(self.student)
                     
-                    print("Face data updated for student:", self.student['name'], type(self.student['face_data']))
+                    confirm_student = self.save_confirmation_remote()
+                    print("Attendance Confirmed: ", confirm_student)
 
-                    # TODO: Update attendance in MongoDB need to fix view controller method
-                    # confirm_student = self.controller.confirm_attendance_update()
-                    # print("Attendance confirmed:", confirm_student)
-                    
+                    print("Face data updated for student:",
+                          self.student['name'], type(self.student['face_data']))
+                
                 except Exception as e:
                     print(f"Student not found:  {e}")
 
                 if self.controller.remote.Student.find_one({"email": self.student['email']}):
-                    student_id = self.student['_id']
-                    print(student_id)
-
+                    # INFO: Uncomment when done testing musk
+                    # student_id = self.student['_id']
+                    # print(student_id)
+                    print("Attendance recorded for existing student.")
+                    message = (f"{student_name} successfully recorded for attendance " +
+                               f"on {formatted_time} for class {class_name}.")
                 else:
                     new_student = self.student
                     print("New student created:", new_student)
-                    message = (f"New student {student_name} added and attendance recorded " + f"on {formatted_time} for class {class_name}.")
-
+                    message = (f"New student {student_name} added and attendance recorded " +
+                               f"on {formatted_time} for class {class_name}.")
             else:
                 message = "No match found. Attendance not recorded."
         except Exception as e:
@@ -306,8 +285,30 @@ class FacialStudentPanel(tk.Frame):
         )
         self.confirmation_label.pack(pady=20)
         close_button = Button(self.confirm_window, text="Close",
-                              command=self.confirm_window.destroy)
+                            command=self.confirm_window.destroy)
         close_button.pack(pady=10)
+
+        
+    # -- Confirm Attendance Update --
+    def save_confirmation_remote(self):
+        """Confirm attendance for a student (example function)."""
+        print("Confirming attendance for student:", self.student)
+
+        print("Student saved with ID:", self.student['_id'])
+        try:
+            print(len(self.student["face_data"]))
+            self.controller.remote.Student.update_one(
+                {"_id": self.student['_id']}, {"$set": {"face_data": self.student["face_data"]}})
+            # self.student.update(schema=StudentUserSchema, query={"_id": self.student['_id']}, update=self.student["face_data"])
+            print("Attendance Confirmation Name:", self.student["name"])
+            return True
+            # result = self.controller.remote.Student.update_one({"email": self.student["email"]}, {"$set": {"face_data": self.student["face_data"]}}) 
+            # print("Update Result:", result)
+            # return True
+        except Exception as e:
+            print("Error confirming attendance:", e)
+            return False
+
 
     # -- Record Attendance --
     def record_attendance(self) -> None:
@@ -346,6 +347,7 @@ class FacialStudentPanel(tk.Frame):
         threading.Thread(target=self.confirm_attendance, args=(
             student_name, class_name, face_path)).start()
 
+    # -- Close Panel --
     def close(self) -> None:
         """Clean up resources when the application is closed."""
         self.running = False
@@ -362,7 +364,7 @@ def main() -> None:
     app = FacialStudentPanel(parent)
     parent.protocol("WM_DELETE_WINDOW", app.close)
     parent.mainloop()
-    
+
 
 if __name__ == "__main__":
     main()

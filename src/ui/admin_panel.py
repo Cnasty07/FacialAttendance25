@@ -43,7 +43,7 @@ class AdminPanel(tk.Frame):
         # self.refresh()
 
     def manage_users(self) -> None:
-        users = self.controller.get_all_students()
+        users = self.controller.all_students
         win = tk.Toplevel(self)
         win.title("Manage Users")
         win.geometry("300x300")

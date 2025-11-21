@@ -9,6 +9,7 @@ class ChooseUserPanel(tk.Frame):
         super().__init__(parent)
         self.controller = controller
         print("Controller: ",self.controller.remote)
+        print(type(self.controller))
         self.built = False
 
     def build_ui(self) -> None:
@@ -29,6 +30,7 @@ class ChooseUserPanel(tk.Frame):
             self.build_ui()
         # additional refresh logic could go here
 
+    # Admin Selected Handler.
     def admin_selected(self) -> bool:
         print("Admin selected")
         if self.controller:
@@ -38,6 +40,7 @@ class ChooseUserPanel(tk.Frame):
                 print("Error switching to AdminPanel:", e)
         return True
 
+    # User Selected Handler.
     def user_selected(self) -> bool:
         print("User selected")
 
@@ -62,16 +65,21 @@ class ChooseUserPanel(tk.Frame):
                     if email:
                         print("Email entered:", email)
                         if email =="em@tamusa.edu":
-                            print("Controller student type : ", type(self.controller.student))
-                            self.controller.student = dict(
-                                _id=123456,
-                                name="Elon Musk",
-                                email="em@tamusa.edu",
-                                face_data=[]
-                            )
-                            self.controller.set_student(self.controller.student)
-                            print("Test user logged in. : ", self.controller.student, type(self.controller.student))
-                            switch_var.set(True)
+                            from src.models.User import StudentUserSchema
+                            id = None
+                            if self.controller.remote.get_student(email) is None:
+                                # Create test user if not exists
+                                test_user = StudentUserSchema(
+                                    name="Elon Musk",
+                                    email="em@tamusa.edu",
+                                    face_data=[],
+                                )
+                                id = test_user.save()
+                            else:
+                                student = self.controller.get_single_student(email)
+                                self.controller.set_student(student)
+                                print("Test user logged in. : ", self.controller.student, type(self.controller.student))
+                                switch_var.set(True)
                         else:
                             student = self.controller.get_single_student(email)
                             self.controller.set_student(self.controller.student)
@@ -109,24 +117,18 @@ class ChooseUserPanel(tk.Frame):
                 print("Error switching to user panel:", e)
         return True
 
+    # Clean up resources on close
     def close(self) -> None:
         """Clean up resources when the application is closed."""
         self.winfo_toplevel().destroy()
 
+
+
+
+
 # -- END Choose User Panel --
 
 def main() -> None:
-    
-    # root = tk.Tk()
-    # root.title("Choose User Panel")
-    # root.geometry("400x300")
-    # # When used standalone, controller can be None
-    # app = ChooseUserPanel(root)
-    # app.on_show()
-    # app.pack(fill="both", expand=True)
-    
-    # root.protocol("WM_DELETE_WINDOW", app.close)
-    # root.mainloop()
     pass
 
 if __name__ == '__main__':
