@@ -2,7 +2,7 @@ import os
 from time import time
 import tkinter as tk
 
-from build.lib.src.models.User import StudentUserModel
+from build.lib.src.models.User import StudentUserSchema
 
 # TODO: Implement Admin Panel functionality
     # 1. Need to get and show all classes
@@ -18,6 +18,7 @@ class AdminPanel(tk.Frame):
     def build_ui(self) -> None:
         """Create widgets once when the panel is shown."""
         self.configure(background="grey")
+        
         title = tk.Label(self, text="Admin Panel",
                          bg="grey", font=("Arial", 18))
         title.pack(pady=20)
@@ -25,7 +26,12 @@ class AdminPanel(tk.Frame):
                   width=50, height=2, font=("Arial", 14)).pack(pady=10)
         tk.Button(self, text="View Reports", command=self.view_reports,
                   width=50, height=2, font=("Arial", 14)).pack(pady=10)
+        
+        tk.Button(self,background="green", text="Add New Student", command=self.add_new_student, width=50, height=2, font=("Arial", 14)).pack(pady=10)
+        
         self.built = True
+
+
 
         # Display List of Classes in raw format
         classes_list = tk.Text(self, height=100, width=100,
@@ -42,6 +48,30 @@ class AdminPanel(tk.Frame):
         # refresh data if needed each time the frame is shown
         # self.refresh()
 
+
+    def add_new_student(self) -> None:
+        # Implement adding a new student (open new window or modal dialog)
+        win = tk.Toplevel(self)
+        win.title("Add New Student")
+        win.geometry("300x200")
+        tk.Label(win, text="Student Name:").pack(pady=10)
+        name_entry = tk.Entry(win)
+        name_entry.pack(pady=5)
+        tk.Label(win, text="Student Email:").pack(pady=10)
+        email_entry = tk.Entry(win)
+        email_entry.pack(pady=5)
+        
+        
+        def submit() -> None:
+            name = name_entry.get()
+            email = email_entry.get()
+            if name and email:
+                new_student = StudentUserSchema(name=name, email=email, face_data=[])
+                id = new_student.save()
+                print(f"Added new student with ID: {id}")
+                win.destroy()
+        tk.Button(win, text="Submit", command=submit).pack(pady=20)
+    
     def manage_users(self) -> None:
         users = self.controller.all_students
         win = tk.Toplevel(self)
@@ -56,6 +86,11 @@ class AdminPanel(tk.Frame):
         # Implement report viewing (open new window or populate this frame)
         pass
 
+    # Refresh on certain commands
+    def refresh(self) -> None:
+        """Refresh the data displayed in the panel."""
+        # Implement data refresh logic if needed
+        pass
 
     def close(self) -> None:
         """Clean up resources when the application is closed."""

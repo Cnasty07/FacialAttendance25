@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import ttk
 
 # INFO: This panel allows the user to choose between Admin and User modes. Rather than doing it from the CLI.
 ## It will then call the controller to switch frames accordingly.
@@ -14,14 +15,16 @@ class ChooseUserPanel(tk.Frame):
 
     def build_ui(self) -> None:
         """Create widgets once when the panel is shown."""
-        self.configure(background="lightblue")
-        title = tk.Label(self, text="Choose User Type Panel",
-                         bg="lightblue", font=("Arial", 16))
-        title.pack(pady=20)
-        tk.Button(self, text="Admin", command=self.admin_selected,
-                  width=20, height=2, font=("Arial", 12)).pack(pady=10)
-        tk.Button(self, text="User", command=self.user_selected,
-                  width=20, height=2, font=("Arial", 12)).pack(pady=10)
+        title = ttk.Label(self, text="Choose User Type Panel")
+        # title.pack(pady=20)
+        title.grid(row=0, column=0, columnspan=2, pady=20)
+        ttk.Button(self, text="Admin", command=self.admin_selected,
+                  width=20).grid(row=1, column=0, pady=10, padx=10)
+
+                #.pack(pady=10)
+        ttk.Button(self, text="User", command=self.user_selected,
+                  width=20).grid(row=1, column=1, pady=10, padx=10)
+                #.pack(pady=10)
         self.built = True
 
     def on_show(self) -> None:
@@ -50,12 +53,12 @@ class ChooseUserPanel(tk.Frame):
                 # Prompt for email in a modal dialog
                 win = tk.Toplevel(self)
                 win.title("Enter Email")
-                win.geometry("350x130")
+                win.geometry("350x130-1400+900")
                 win.resizable(False, False)
-                tk.Label(win, text="Please enter your email:", font=("Arial", 11)).pack(pady=(10, 5), padx=10)
+                ttk.Label(win, text="Please enter your email:", font=("Arial", 11)).pack(pady=(10, 5), padx=10)
 
                 email_var = tk.StringVar()
-                entry = tk.Entry(win, textvariable=email_var, width=40, font=("Arial", 10))
+                entry = ttk.Entry(win, textvariable=email_var, width=40, font=("Arial", 10))
                 entry.pack(padx=10)
                 entry.focus_set()
                 

@@ -37,13 +37,40 @@ class FacialStudentPanel(tk.Frame):
         self.controller = controller
         # New database connection for remote MongoDB
         # self.db = self.controller.remote
-
+        
+        # Configure grid sizing/constraints so camera expands
+        # Title is row 0, combobox row 1, controls row 2, camera row 3
+        self.grid_rowconfigure(0, weight=0)
+        self.grid_rowconfigure(1, weight=0, pad=10)
+        self.grid_rowconfigure(2, weight=0, pad=10)
+        self.grid_rowconfigure(3, weight=1, minsize=200)
+        
+        # Make left and center columns expand; right-side buttons stay their natural size
+        self.grid_columnconfigure(0, weight=1, uniform="maincols")
+        self.grid_columnconfigure(1, weight=1, uniform="maincols")
+        self.grid_columnconfigure(2, weight=0, uniform="maincols")
+        self.grid_columnconfigure(3, weight=0)
+        
+        # Ensure widgets that should fill their cells use sticky
+        # Example: let camera fill whole row and expand
+        # self.camera_frame.grid(row=3, column=0, columnspan=4, sticky="nsew", padx=5, pady=5)
+        
+        # # Make labels/buttons stretch horizontally if desired (use sticky="ew")
+        # self.class_list.grid(row=1, column=0, columnspan=2, sticky="ew", padx=5)
+        # self.input_label.grid(row=2, column=0, sticky="e", padx=5)
+        # self.name_label.grid(row=2, column=1, sticky="w", padx=5)
+        # self.record_button.grid(row=2, column=2, sticky="ew", padx=5)
+        # self.update_face_button.grid(row=2, column=3, sticky="ew", padx=5)
+        
         # Title label (inside this frame)
-        self.title_label = Label(
+        self.title_label = ttk.Label(
             self, text="Facial Attendance System", font=("Helvetica", 20, "bold"))
-        self.title_label.pack(pady=10)
+        self.title_label.grid(row=0, column=0, columnspan=3, pady=10)
 
-        self.configure(bg="lightblue")
+        # self.sep = ttk.Separator(self, orient='horizontal')
+        # self.sep.grid(row=1, column=0, columnspan=2, sticky="ew", pady=5)
+
+        # self.configure(bg="lightblue")
         
         # Initialize facial controller (may be stateful)
         try:
@@ -52,15 +79,14 @@ class FacialStudentPanel(tk.Frame):
             # Fallback to static usage if FacialController only exposes staticmethods
             self.fc = FacialController
 
+        # Selected class data
         def on_select(event):
             _ = self.class_list.get()
             print(f"Selected class: {_}")
             # searching for data for class
-            for classes in self.controller.remote.Classes.find():
+            for classes in self.controller.all_classes:
                 if classes['name'] == _:
                     print(f"Found class data: {classes}")
-                    # self.file_path = classes['face_data_path']
-                    # print(f"Face data path set to: {self.file_path}")
                     break
 
         try:
@@ -74,46 +100,48 @@ class FacialStudentPanel(tk.Frame):
         # Extract class names shows as "course_code : name"
         class_names = [
             f"{cls['course_code']} : {cls['name']}" for cls in classes_list]
-
         # Class selection combobox
         self.class_list = ttk.Combobox(self)
         self.class_list['values'] = class_names
         self.class_list.set("Select Class")
         self.class_list.bind("<<ComboboxSelected>>", on_select)
-        self.class_list.pack(pady=10)
+        self.class_list.grid(row=1, column=0,ipadx=5, sticky="w")
 
-        # Camera feed frame (Label used to hold image)
-        self.camera_frame = Label(self, width=200, height=400)
-        self.camera_frame.pack(pady=10, expand=True, fill="both")
+        # # Camera feed frame (Label used to hold image)
+        # self.camera_frame = Label(self, width=self.parent.winfo_width()//2, height=(self.parent.winfo_height()//4))
+        # self.camera_frame.pack(pady=10, expand=False, fill="both")
+
 
         # Input field for student name
-        self.input_label = Label(
-            self, text="Current Student Name", font=("Helvetica", 14))
-        self.input_label.pack(pady=5, side="left")
+        self.input_label = ttk.Label(
+            self, text="Current Student Name:", font=("Helvetica", 14))
+        self.input_label.grid(row=2, column=0, ipadx=5, sticky="w")
 
-        self.name_label = Label(
+        self.name_label = ttk.Label(
             self, text="student name", font=("Helvetica", 14))
-        self.name_label.pack(pady=5, side="right", after=self.input_label)
-
+        self.name_label.grid(row=2, column=0, ipadx=5, sticky="e")
+        
         # Record attendance button
-        self.record_button = Button(self, text="Record Attendance", font=(
-            "Helvetica", 14), command=self.record_attendance)
-        self.record_button.pack(pady=10)
-
+        self.record_button = ttk.Button(self, text="Record Attendance", command=self.record_attendance)
+        self.record_button.grid(row=1, column=1, ipadx=5, sticky="e")
         # Update Student Face Data Button
-        self.update_face_button = Button(self, text="Update Face Data", font=(
-            "Helvetica", 14), command=self.update_face_data)
-        self.update_face_button.pack(pady=10)
-
+        self.update_face_button = ttk.Button(self, text="Update Face Data", command=self.update_face_data)
+        self.update_face_button.grid(row=1, column=2, ipadx=5, sticky="w")
+        
+        
+        # Camera feed frame (Label used to hold image)
+        self.camera_frame = ttk.Label(self)
+        self.camera_frame.grid(row=3, column=0,columnspan=3, ipadx=5, sticky="ew")
+        # self.camera_frame.pack()
         # Camera
         self.cap = cv2.VideoCapture(0)
 
         # Handles no camera found error
         if self.cap is None or not self.cap.isOpened():
-            self.camera_frame.pack_forget()
-            error_label = Label(
-                self, text="Error: Could not access the camera.", fg="red", font=("Helvetica", 14))
-            error_label.pack(pady=10)
+            self.camera_frame.grid_forget()
+            error_label = ttk.Label(
+                self, text="Error: Could not access the camera.", foreground="red", font=("Helvetica", 14))
+            error_label.grid(row=3, column=0, columnspan=3, ipadx=5)
             self.running = False
         else:
             self.running = True
@@ -134,7 +162,7 @@ class FacialStudentPanel(tk.Frame):
         if self.student['name'] == "Elon Musk":
             self.confirm_button = tk.Button(self, text="Confirm Attendance", font=(
                 "Helvetica", 14), command=self.test_confirm_attendance)
-            self.confirm_button.pack(pady=10)
+            self.confirm_button.grid(row=4, column=2,pady=10)
 
     # -- Test Confirm Attendance --
     def test_confirm_attendance(self):
@@ -194,7 +222,7 @@ class FacialStudentPanel(tk.Frame):
         if ret:
             # Convert BGR (OpenCV) to RGB (Pillow)
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-
+            frame = cv2.resize(frame, (800, 500))
             frame_image = ImageTk.PhotoImage(Image.fromarray(frame))
             self.camera_frame.configure(image=frame_image)
             self.camera_frame.image = frame_image
@@ -214,6 +242,7 @@ class FacialStudentPanel(tk.Frame):
                 None
         """
         message = ""
+        is_match: bool = False
         # Process and Match Face
         try:
             unknown_face = self.fc.process_image(face_path)
@@ -226,13 +255,10 @@ class FacialStudentPanel(tk.Frame):
                     for face in load_known_faces:
                         print("Adding initial face data for test user.")
                         self.student['face_data'].append(face.tolist())
-                    # self.controller.set_student(self.student)
                 # filters out only the encodings
-                known_encodings = [
-                    face_encoding for face_encoding in load_known_faces]
+                known_encodings = [face_encoding for face_encoding in load_known_faces]
                 # Compare the unknown face to the known faces
-                is_match = self.fc.match_processed_image(
-                    unknown_face, known_encodings)
+                is_match = self.fc.match_processed_image(unknown_face, known_encodings)
 
                 student_id = self.student['_id']
             except ValueError:
@@ -258,14 +284,17 @@ class FacialStudentPanel(tk.Frame):
                 except Exception as e:
                     print(f"Student not found:  {e}")
 
-                if self.controller.remote.Student.find_one({"email": self.student['email']}):
-                    # INFO: Uncomment when done testing musk
-                    # student_id = self.student['_id']
-                    # print(student_id)
+                # Printing message for confirmation on student attendance
+                if self.controller.remote.Student.find_one(student_id):
                     print("Attendance recorded for existing student.")
                     message = (f"{student_name} successfully recorded for attendance " +
                                f"on {formatted_time} for class {class_name}.")
+                # if self.controller.remote.Student.find_one({"email": self.student['email']}):
+                #     print("Attendance recorded for existing student.")
+                #     message = (f"{student_name} successfully recorded for attendance " +
+                #                f"on {formatted_time} for class {class_name}.")
                 else:
+                    # Delete when done. Will not be used once DB is set up properly.
                     new_student = self.student
                     print("New student created:", new_student)
                     message = (f"New student {student_name} added and attendance recorded " +
@@ -292,19 +321,15 @@ class FacialStudentPanel(tk.Frame):
     # -- Confirm Attendance Update --
     def save_confirmation_remote(self):
         """Confirm attendance for a student (example function)."""
-        print("Confirming attendance for student:", self.student)
+        print("Confirming attendance for student:", self.student['name'])
 
         print("Student saved with ID:", self.student['_id'])
         try:
             print(len(self.student["face_data"]))
             self.controller.remote.Student.update_one(
                 {"_id": self.student['_id']}, {"$set": {"face_data": self.student["face_data"]}})
-            # self.student.update(schema=StudentUserSchema, query={"_id": self.student['_id']}, update=self.student["face_data"])
             print("Attendance Confirmation Name:", self.student["name"])
             return True
-            # result = self.controller.remote.Student.update_one({"email": self.student["email"]}, {"$set": {"face_data": self.student["face_data"]}}) 
-            # print("Update Result:", result)
-            # return True
         except Exception as e:
             print("Error confirming attendance:", e)
             return False
@@ -342,7 +367,11 @@ class FacialStudentPanel(tk.Frame):
         print(f"Face captured and saved to {face_path}")
 
         # Get student name and class name from input fields
-        student_name = self.name_label.get() or "Unknown Student"
+        try:
+            print("Recording attendance for student:", self.student['name'])
+        except Exception as e:
+            print("Error getting student name:", e)
+        student_name = self.student['name'] or "Unknown Student"
         class_name = self.class_list.get() or "Unknown Class"
         threading.Thread(target=self.confirm_attendance, args=(
             student_name, class_name, face_path)).start()
@@ -360,10 +389,10 @@ class FacialStudentPanel(tk.Frame):
 # -- Standalone Test Runner --
 def main() -> None:
     """Run the Facial Student Panel as a standalone application for testing."""
-    parent = tk.Tk()
-    app = FacialStudentPanel(parent)
-    parent.protocol("WM_DELETE_WINDOW", app.close)
-    parent.mainloop()
+    # parent = tk.Tk()
+    # app = FacialStudentPanel(parent)
+    # parent.protocol("WM_DELETE_WINDOW", app.close)
+    # parent.mainloop()
 
 
 if __name__ == "__main__":

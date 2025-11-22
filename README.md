@@ -21,6 +21,12 @@ And then use the command:
 pipenv run python main.py
 ```
 
+*If errors returns not found then should sync the pipfile and lock* :
+
+```{bash}
+pipenv sync
+```
+
 ## Overview
 
 A Python-based facial recognition system for managing and recording student attendance. It utilizes machine learning for face detection and recognition, integrated with a SQLite database for data management, and provides a user-friendly GUI built with Tkinter.

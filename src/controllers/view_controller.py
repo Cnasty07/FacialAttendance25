@@ -1,4 +1,5 @@
 import tkinter as tk
+import tkinter.ttk as ttk
 from src import ui
 
 # Testing Adding Variables to Frames and Passing Data Between Frames
@@ -26,14 +27,37 @@ class AppController(tk.Tk):
 
         # Setting up main window and container for frames
         self.title("Facial Attendance System")
-        self.geometry("800x600")
+        
+        # Center the window on the screen
+        self.swidth = int(self.winfo_screenwidth()/2 - 400)
+        self.sheight = int(self.winfo_screenheight()/2 - 300)
+        print("Screen Width:", self.swidth, "Screen Height:", self.sheight)
+        self.geometry(f"800x600+{self.swidth}+{self.sheight}")
+        # self.minsize(800, 600)
+        # self.maxsize(800, 600)
+        ## Menu to switch user types
+        self.menubar = tk.Menu(self)
+        self.config(menu=self.menubar)
+        
+        switch_menu = tk.Menu(self.menubar, tearoff=0)
+        switch_menu.add_command(label="Switch User Type", command=self.switch_user)
+        self.menubar.add_cascade(label="View", menu=switch_menu)
+        
+        # Set ttk theme
+        self.style = ttk.Style(self)
+        print(self.style.theme_names())
+        self.style.theme_use("aqua")
+        
+        # self.grid_rowconfigure(0, weight=1)
+        # self.grid_columnconfigure(0, weight=1)
 
         # Container for all frames
         container = tk.Frame(self)
         container.pack(fill="both", expand=True)
+        container.grid(row=0, column=0, sticky="nsew")
         container.grid_rowconfigure(0, weight=1)
         container.grid_columnconfigure(0, weight=1)
-
+        
         self.frames = {}
 
         for F, name in (
@@ -46,6 +70,11 @@ class AppController(tk.Tk):
             frame.grid(row=0, column=0, sticky="nsew")
 
         # optionally show initial frame
+        self.show_frame("ChooseUserPanel")
+        
+        
+    def switch_user(self) -> None:
+        """Switch back to the Choose User Panel."""
         self.show_frame("ChooseUserPanel")
 
     ## --- Student Related Methods --- ##
