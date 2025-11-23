@@ -143,10 +143,10 @@ def main():
     from utils.gpu_detection import is_gpu_available
     is_gpu_available()
 
-    facialController = FacialController()
-    known_faces = facialController.load_known_faces()
-    print("Known faces loaded.")
-    print(known_faces)
+    # facialController = FacialController()
+    # known_faces = facialController.load_known_faces()
+    # print("Known faces loaded.")
+    # print(known_faces)
 
 
 if __name__ == "__main__":

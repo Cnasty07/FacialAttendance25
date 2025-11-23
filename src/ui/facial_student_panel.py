@@ -1,4 +1,5 @@
 # Facial Student Panel UI using Tkinter
+from ensurepip import bootstrap
 import threading
 import datetime
 from datetime import datetime
@@ -56,11 +57,11 @@ class FacialStudentPanel(tk.Frame):
         self.grid_columnconfigure(3, weight=0, uniform="maincols")
 
 
-        # Title label (inside this frame)
+        # Title label
         self.title_label = ttk.Label(
             self, text="Facial Attendance System", font=("Helvetica", 20, "bold"), bootstyle=DEFAULT)
-        self.title_label.grid(row=0, column=1, columnspan=2, pady=10, padx=10)
-        
+        # Place in row 0, spanning from column 1 to the end (before the action bar)
+        self.title_label.grid(row=0, column=1, columnspan= 2, sticky="ew", pady=10, padx=10)
         # Initialize facial controller (may be stateful)
         try:
             self.fc = FacialController()
@@ -107,48 +108,92 @@ class FacialStudentPanel(tk.Frame):
 
         
         # Update Student Face Data Button
-        self.update_face_button = ttbk.Button(self.actions, text="Update\nPortrait", command=self.update_face_data, style="primary.TButton", bootstyle=PRIMARY)
+        # self.update_face_button = ttbk.Button(self.actions, text="Update\nPortrait", command=self.update_face_data, style="primary.TButton", bootstyle=PRIMARY)
         # self.update_face_button.grid(row=2, column=0, pady=10, padx=2)
 
 
+        self.role_call = ttbk.Notebook(self.actions, bootstyle=PRIMARY)
+        self.checked_in_tab = ttbk.Frame(self.role_call)
+        self.not_checked_in_tab = ttbk.Frame(self.role_call)
+        self.role_call.add(self.checked_in_tab, text="Present")
+        self.role_call.add(self.not_checked_in_tab, text="Absent")
+        
+        self.present = ttbk.Frame(self.checked_in_tab)
+        self.absent = ttbk.Frame(self.not_checked_in_tab)
+
+        
+        self.present_list = tk.Listbox(self.present)
+        self.present_list.insert(tk.END, "No students present yet.")
+        self.present_list.pack(fill="both", expand=True, padx=5, pady=5)
+        self.absent_list = tk.Listbox(self.absent)
+        self.absent_list.insert(tk.END, "No students absent yet.")
+        self.absent_list.pack(fill="both", expand=True, padx=5, pady=5)
+
+        
+
         self.class_list.pack(pady=10, expand=False, fill="x")
         ttbk.Separator(self.actions, orient='horizontal', bootstyle=PRIMARY).pack(fill="x", pady=10)
-        self.update_face_button.pack(pady=20, expand=True, fill="both")
+        self.role_call.pack(pady=10, expand=True, fill="both")
+        ttbk.Separator(self.actions, orient='horizontal', bootstyle=PRIMARY).pack(fill="x", pady=10)
+        # self.update_face_button.pack(pady=20, expand=True, fill="both")
         ttbk.Separator(self.actions, orient='horizontal', bootstyle=PRIMARY).pack(fill="x", pady=10)
         self.record_button.pack(pady=20, expand=True, fill="both")
+
         
         # LABELFRAME STUDENT INFO
         self.name_frame = ttbk.Labelframe(self, text="Logged In As:", bootstyle=INFO)
-        self.name_frame.grid(row=0, column=0, rowspan=2, columnspan=1, ipadx=5, sticky="nsew", padx=10, pady=10)
+        # Place in the top left, spanning both content rows
+        self.name_frame.grid(row=0, column=0, rowspan=2, sticky="nsew", padx=10, pady=10)
 
-        # Input field for student name
-        self.email_label = ttbk.Label(
-            self.name_frame, text="Name:", font=("Helvetica", 10), bootstyle=(SECONDARY, INVERSE))
-        # self.email_label.grid(row=1, column=0, ipadx=1, sticky="ew")
+        # --- Switch to GRID inside self.name_frame ---
+        self.name_frame.grid_columnconfigure(0, weight=1) # Make the single column expand
+        self.name_frame.grid_rowconfigure(0, weight=1) # Name label
 
-        # self.sep = ttbk.Separator(self.name_frame, orient='horizontal', bootstyle=INFO)
-        # self.sep.grid(row=0, column=1, ipadx=5, sticky="ew")
-        
         self.name_label = ttbk.Label(
             self.name_frame, text="student name", font=("Helvetica", 12), bootstyle=(SECONDARY, INVERSE))
-        # self.name_label.grid(row=0, column=0, ipadx=1, sticky="ew")
+        self.name_label.grid(row=0, column=0, sticky="ew", padx=2, pady=2)
 
-        self.name_label.pack(expand=True, fill="x",padx=1,pady=1)
-        self.email_label.pack(expand=True, fill="x", padx=1, pady=1)
+
+        # Main Frame for Camera and Source Image Tabs
+        self.notebook = ttbk.Notebook(self, bootstyle=SECONDARY)
+        self.notebook.grid(row=2, column=0, columnspan=3, rowspan=2, sticky="nsew", padx=10, pady=10)
         
-        # Camera feed frame (Label used to hold image)
-        self.camera_frame = ttk.Label(self)
-        self.camera_frame.grid(row=3, column=0,columnspan=3, ipadx=5, sticky="ew")
-        # self.camera_frame.pack()
+
+        self.camera_tab = ttbk.Frame(self.notebook, bootstyle=SECONDARY)
+        self.source_tab = ttbk.Frame(self.notebook, bootstyle=SECONDARY)
+
+        self.notebook.add(self.camera_tab, text="Camera Feed")
+        self.notebook.add(self.source_tab, text="Source Image")
+        self.camera_tab.rowconfigure(0, weight=1)
+        self.camera_tab.columnconfigure(0, weight=1)
+        self.source_tab.rowconfigure(0, weight=1)
+        self.source_tab.columnconfigure(0, weight=1)
+        # Camera feed frame (Label used to hold image/error)
+        self.camera_frame = ttbk.Label(self.camera_tab, background='black') # Added background for visibility
+        # Place in row 1, spanning from column 1 to the end (before the action bar)
+        self.camera_frame.grid(row=1, column=1, sticky="nsew", padx=10, pady=10)
+
+        self.source_tab.rowconfigure(0, weight=1)
+        self.source_tab.columnconfigure(0, weight=1)
+        self.source_tab.rowconfigure(1, weight=1)
+        self.source_tab.columnconfigure(1, weight=1)
+        self.source_tab.grid_rowconfigure(2, weight=1)
+
+        ttbk.Label(self.source_tab, text="Please Add Path To Image", font=("Helvetica", 14), bootstyle=(SECONDARY,INVERSE)).grid(row=0, column=0, columnspan=2, sticky="ew", padx=10, pady=10)
+        ttbk.Button(self.source_tab, text="Update Face From File", command=self.upload_from_file, bootstyle=SUCCESS).grid(row=2, column=0, columnspan=2, sticky="ew", padx=10, pady=10)
+        self.update_entry_path = ttbk.Entry(self.source_tab, bootstyle=PRIMARY)
+        self.update_entry_path.insert(0, "ex: .\\Database\\Tests\\<YourFaceHere>.jpg")
+        self.update_entry_path.grid(row=1, column=0, columnspan=2, sticky="ew", padx=10, pady=10)
+        
         # Camera
         self.cap = cv2.VideoCapture(0)
 
         # Handles no camera found error
         if self.cap is None or not self.cap.isOpened():
             self.camera_frame.grid_forget()
-            error_label = ttk.Label(
-                self, text="Error: Could not access the camera.", foreground="red", font=("Helvetica", 14))
-            error_label.grid(row=3, column=0, columnspan=3, ipadx=5)
+            error_label = ttbk.Label(
+                self.camera_tab, text="Error: Could not access the camera.", bootstyle=DANGER)
+            error_label.grid(row=0, column=0, sticky="nsew", ipadx=5)
             self.running = False
         else:
             self.running = True
@@ -163,7 +208,6 @@ class FacialStudentPanel(tk.Frame):
             self.student = self.controller.load_student()
             print("FacialStudentPanel on_show loaded student: ", self.student)
             self.name_label.config(text=f"{self.student['name']}")
-            self.email_label.config(text=f"{self.student['email']}")
         except Exception as e:
             print("Error in on_show:", e)
 
@@ -225,6 +269,22 @@ class FacialStudentPanel(tk.Frame):
         # Here you would add code to update the student's face data in the database
         messagebox.showinfo(
             "Success", f"Face data for {student_name} has been updated.")
+
+    def upload_from_file(self) -> None:
+        """Upload face data from a file to update the student's face data."""
+        file_path = self.update_entry_path.get().strip()
+        print("File path entered:", file_path)
+        try:
+            unknown_face = self.fc.process_image(file_path)
+            print("Unknown Face Encoding from file: ", unknown_face, type(unknown_face))
+            self.student['face_data'].append(unknown_face.tolist())
+            self.save_confirmation_remote()
+        except Exception as e:
+            print("Error processing image from file:", e)
+            return
+
+
+
 
     # -- Update Camera Feed --
     def update_camera(self) -> None:
