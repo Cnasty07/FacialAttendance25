@@ -84,10 +84,44 @@ class ChooseUserPanel(ttk.Frame):
     def admin_selected(self) -> bool:
         print("Admin selected")
         if self.controller:
-            try:
+            win = ttk.Toplevel(self.controller)
+            win.transient(self.controller)
+            win.grab_set()
+            x = self.winfo_rootx() + self.winfo_width() // 2
+            y = self.winfo_rooty() + self.winfo_height() // 2
+            win.title("Enter Admin Password")
+            win.geometry(f"350x160-{x}+{y}")
+            win.resizable(False, False)
+            ttk.Label(win, text="Please enter the admin password:", font=("Arial", 11)).pack(pady=(10, 5), padx=10)
+            password_var = ttk.StringVar()
+            entry = ttk.Entry(win, textvariable=password_var, width=40, font=("Arial", 10), bootstyle=PRIMARY, show="*")
+            entry.pack(padx=10)
+            entry.focus_set()
+            switch_var = ttk.BooleanVar(value=False) # var to swith view on successful password entry
+            def submit_password() -> bool:    
+                # Submit password would technically be here if i get around to it.
+                if password_var.get() == "admin123":  # Example password check
+                    print("Admin password correct.")
+                    switch_var.set(True)
+                else:     
+                    ttk.Label(win, text="Incorrect password.", bootstyle=DANGER,font=("Arial", 10)).pack(pady=5)
+                    return
+
+                win.destroy()
+
+
+            btn_frame = ttk.Frame(win, bootstyle=DEFAULT)
+            btn_frame.pack(padx=5, pady=10, ipadx=5,ipady=5)
+            ttk.Button(btn_frame, text="Enter", width=10, command=submit_password, bootstyle=SUCCESS).pack(side="left",expand=True)
+            ttk.Button(btn_frame, text="Cancel", width=10, command=win.destroy, bootstyle=DANGER).pack(side="left", expand=True)
+
+            # Make dialog modal
+            win.transient(self.winfo_toplevel())
+            win.grab_set()
+            self.winfo_toplevel().wait_window(win)
+            # target name should match the key used in AppController
+            if switch_var.get():
                 self.controller.show_frame("AdminPanel")
-            except Exception as e:
-                print("Error switching to AdminPanel:", e)
         return True
 
     # User Selected Handler.
@@ -155,9 +189,9 @@ class ChooseUserPanel(ttk.Frame):
                     win.destroy()
 
                 btn_frame = ttk.Frame(win, bootstyle=DEFAULT)
-                btn_frame.pack(pady=8)
-                ttk.Button(btn_frame, text="OK", width=10, command=submit_email, bootstyle=SUCCESS).pack(side="left", padx=5)
-                ttk.Button(btn_frame, text="Cancel", width=10, command=win.destroy, bootstyle=DANGER).pack(side="left", padx=5)
+                btn_frame.pack(padx=5, pady=10, ipadx=5,ipady=5)
+                ttk.Button(btn_frame, text="Enter", width=10, command=submit_email, bootstyle=SUCCESS).pack(side="left",expand=True)
+                ttk.Button(btn_frame, text="Cancel", width=10, command=win.destroy, bootstyle=DANGER).pack(side="left", expand=True)
 
                 # Make dialog modal
                 win.transient(self.winfo_toplevel())
