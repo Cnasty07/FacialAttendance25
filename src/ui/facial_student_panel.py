@@ -99,14 +99,15 @@ class FacialStudentPanel(tk.Frame):
         self.class_list.set("Select Class")
         self.class_list.bind("<<ComboboxSelected>>", on_select)
         # self.class_list.grid(row=0, column=0,ipadx=5,pady=10, padx=2, sticky="ne")
-        
+        self.style = ttbk.Style()
+        self.style.configure("primary.TButton", font=("Helvetica", 16, "bold"))
         # Record attendance button
         self.record_button = ttbk.Button(self.actions, text="Record Attendance", command=self.record_attendance, bootstyle=SUCCESS)
         # self.record_button.grid(row=1, column=0, ipadx=5, padx=2, pady=10)
 
         
         # Update Student Face Data Button
-        self.update_face_button = ttbk.Button(self.actions, text="Update Face Data", command=self.update_face_data, bootstyle=PRIMARY)
+        self.update_face_button = ttbk.Button(self.actions, text="Update\nPortrait", command=self.update_face_data, style="primary.TButton", bootstyle=PRIMARY)
         # self.update_face_button.grid(row=2, column=0, pady=10, padx=2)
 
 
@@ -115,7 +116,6 @@ class FacialStudentPanel(tk.Frame):
         self.update_face_button.pack(pady=20, expand=True, fill="both")
         ttbk.Separator(self.actions, orient='horizontal', bootstyle=PRIMARY).pack(fill="x", pady=10)
         self.record_button.pack(pady=20, expand=True, fill="both")
-
         
         # LABELFRAME STUDENT INFO
         self.name_frame = ttbk.Labelframe(self, text="Logged In As:", bootstyle=INFO)
@@ -123,15 +123,18 @@ class FacialStudentPanel(tk.Frame):
 
         # Input field for student name
         self.email_label = ttbk.Label(
-            self.name_frame, text="Name:", font=("Helvetica", 14), bootstyle=(SECONDARY, INVERSE))
-        self.email_label.grid(row=1, column=0, ipadx=1, sticky="ew")
+            self.name_frame, text="Name:", font=("Helvetica", 10), bootstyle=(SECONDARY, INVERSE))
+        # self.email_label.grid(row=1, column=0, ipadx=1, sticky="ew")
 
         # self.sep = ttbk.Separator(self.name_frame, orient='horizontal', bootstyle=INFO)
         # self.sep.grid(row=0, column=1, ipadx=5, sticky="ew")
         
         self.name_label = ttbk.Label(
-            self.name_frame, text="student name", font=("Helvetica", 14), bootstyle=(SECONDARY, INVERSE))
-        self.name_label.grid(row=0, column=0, ipadx=1, sticky="ew")
+            self.name_frame, text="student name", font=("Helvetica", 12), bootstyle=(SECONDARY, INVERSE))
+        # self.name_label.grid(row=0, column=0, ipadx=1, sticky="ew")
+
+        self.name_label.pack(expand=True, fill="x",padx=1,pady=1)
+        self.email_label.pack(expand=True, fill="x", padx=1, pady=1)
         
         # Camera feed frame (Label used to hold image)
         self.camera_frame = ttk.Label(self)

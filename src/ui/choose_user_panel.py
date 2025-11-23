@@ -25,7 +25,9 @@ class ChooseUserPanel(ttk.Frame):
         """Create widgets once when the panel is shown."""
         title = ttk.Label(self, text="Choose User Type Panel", font=("Arial", 18, "bold", "underline"))
         title.grid(row=0, columnspan=2)
-        
+        self.style = ttk.Style()
+        self.style.configure("primary.TButton",font=("Helvetica", 16, "bold"))
+        self.style.configure("success.TButton",font=("Helvetica", 16, "bold"))
         self.admin_button = ttk.Button(self, text="Admin", command=self.admin_selected, bootstyle=PRIMARY)
         self.admin_button.grid(row=1, column=0, ipady=10, ipadx=10, sticky="nsew")
 
