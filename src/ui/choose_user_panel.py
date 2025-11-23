@@ -1,30 +1,36 @@
 import tkinter as tk
-from tkinter import ttk
-
+# from tkinter import ttk
+import ttkbootstrap as ttk
+from ttkbootstrap.constants import *
 # INFO: This panel allows the user to choose between Admin and User modes. Rather than doing it from the CLI.
 ## It will then call the controller to switch frames accordingly.
 
 # -- Choose User Panel --
-class ChooseUserPanel(tk.Frame):
+class ChooseUserPanel(ttk.Frame):
     def __init__(self, parent, controller) -> None:
         super().__init__(parent)
         self.controller = controller
         print("Controller: ",self.controller.remote)
         print(type(self.controller))
+        print("Tester : ",self.winfo_width(), self.winfo_height())
+
+        # Grid Configuration
+        self.grid_rowconfigure(0, weight=1, uniform="mainrows", pad=10)
+        self.grid_rowconfigure(1, weight=1, uniform="mainrows", pad=10)
+        self.grid_columnconfigure(0, weight=1, uniform="maincols", pad=10)
+        self.grid_columnconfigure(1, weight=1, uniform="maincols", pad=10)
         self.built = False
 
     def build_ui(self) -> None:
         """Create widgets once when the panel is shown."""
-        title = ttk.Label(self, text="Choose User Type Panel")
-        # title.pack(pady=20)
-        title.grid(row=0, column=0, columnspan=2, pady=20)
-        ttk.Button(self, text="Admin", command=self.admin_selected,
-                  width=20).grid(row=1, column=0, pady=10, padx=10)
+        title = ttk.Label(self, text="Choose User Type Panel", font=("Arial", 18, "bold", "underline"))
+        title.grid(row=0, columnspan=2)
+        
+        self.admin_button = ttk.Button(self, text="Admin", command=self.admin_selected, bootstyle=PRIMARY)
+        self.admin_button.grid(row=1, column=0, ipady=10, ipadx=10, sticky="nsew")
 
-                #.pack(pady=10)
-        ttk.Button(self, text="User", command=self.user_selected,
-                  width=20).grid(row=1, column=1, pady=10, padx=10)
-                #.pack(pady=10)
+        self.user_button = ttk.Button(self, text="Student", command=self.user_selected, bootstyle=SUCCESS)
+        self.user_button.grid(row=1, column=1, ipady=10, ipadx=10, sticky="nsew")
         self.built = True
 
     def on_show(self) -> None:
@@ -51,22 +57,23 @@ class ChooseUserPanel(tk.Frame):
         if self.controller:
             try:
                 # Prompt for email in a modal dialog
-                win = tk.Toplevel(self)
+                win = ttk.Toplevel(self)
                 win.title("Enter Email")
-                win.geometry("350x130-1400+900")
+                win.geometry("350x160-1400+900")
                 win.resizable(False, False)
                 ttk.Label(win, text="Please enter your email:", font=("Arial", 11)).pack(pady=(10, 5), padx=10)
 
-                email_var = tk.StringVar()
-                entry = ttk.Entry(win, textvariable=email_var, width=40, font=("Arial", 10))
+                email_var = ttk.StringVar()
+                entry = ttk.Entry(win, textvariable=email_var, width=40, font=("Arial", 10), bootstyle=PRIMARY)
                 entry.pack(padx=10)
                 entry.focus_set()
                 
-                switch_var = tk.BooleanVar(value=False) # var to swith view on successful email entry
+                switch_var = ttk.BooleanVar(value=False) # var to swith view on successful email entry
                 def submit_email():
                     email = email_var.get().strip()
                     if email:
                         print("Email entered:", email)
+                        # Test user shortcut
                         if email =="em@tamusa.edu":
                             from src.models.User import StudentUserSchema
                             id = None
@@ -83,16 +90,17 @@ class ChooseUserPanel(tk.Frame):
                                 self.controller.set_student(student)
                                 print("Test user logged in. : ", self.controller.student, type(self.controller.student))
                                 switch_var.set(True)
+                        # Normal User Flow
                         else:
                             student = self.controller.get_single_student(email)
-                            self.controller.set_student(self.controller.student)
-                            print("Student fetched:", student["name"])
-                            self.controller.student = student
-                            
+                            # self.controller.set_student(self.controller.student) # Unsure if i need to set it again here
                             if not student:
                                 print("No student found with that email.")
-                                tk.Label(win, text="No student found with that email.", fg="red", font=("Arial", 10)).pack(pady=5)
+                                ttk.Label(win, text="No student found with that email.", bootstyle=DANGER,font=("Arial", 10)).pack(pady=5)
                                 return
+                            print("Student fetched:", student["name"])
+                            self.controller.student = student
+                            self.controller.set_student(student)
                             switch_var.set(True)
                             
                     # If controller supports receiving the email, pass it along.
@@ -103,10 +111,10 @@ class ChooseUserPanel(tk.Frame):
                             pass
                     win.destroy()
 
-                btn_frame = tk.Frame(win)
+                btn_frame = ttk.Frame(win)
                 btn_frame.pack(pady=8)
-                tk.Button(btn_frame, text="OK", width=10, command=submit_email).pack(side="left", padx=5)
-                tk.Button(btn_frame, text="Cancel", width=10, command=win.destroy).pack(side="left", padx=5)
+                ttk.Button(btn_frame, text="OK", width=10, command=submit_email, bootstyle=SUCCESS).pack(side="left", padx=5)
+                ttk.Button(btn_frame, text="Cancel", width=10, command=win.destroy, bootstyle=DANGER).pack(side="left", padx=5)
 
                 # Make dialog modal
                 win.transient(self.winfo_toplevel())

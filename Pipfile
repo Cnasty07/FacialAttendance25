@@ -17,6 +17,7 @@ pymongo = {extras = ["srv"], version = "*"}
 pandas = "*"
 pyarrow = "*"
 pymongoose = "*"
+ttkbootstrap = "*"
 
 [dev-packages]
 

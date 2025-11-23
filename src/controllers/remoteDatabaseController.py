@@ -46,6 +46,14 @@ class remoteController:
         return all_students
 
     def get_class(self, class_name: str) -> ClassesSchema | None:
+        """_summary_
+            Fetch a class from the database by name.
+        Args:
+            class_name (str): _description_
+
+        Returns:
+            ClassesSchema | None: _description_
+        """
         try:
             classes = self.Classes.find_one({"name": class_name})
         except Exception as e:
@@ -55,6 +63,11 @@ class remoteController:
         return classes
 
     def get_all_classes(self) -> list[ClassesSchema]:
+        """_summary_
+            Fetch all classes from the database.
+        Returns:
+            list[ClassesSchema]: _description_
+        """
         try:
             classes = self.Classes.find({})
         except Exception as e:

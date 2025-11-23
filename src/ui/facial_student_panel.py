@@ -7,8 +7,13 @@ from datetime import datetime
 import tkinter as tk
 from tkinter import ttk
 from tkinter import Label, Button, messagebox
+from tkinter import font
 
-# import pandas as pd
+# Trying Styling
+import ttkbootstrap as ttbk
+from ttkbootstrap.constants import *
+
+# Image Handling
 import cv2
 from PIL import Image, ImageTk
 
@@ -35,12 +40,11 @@ class FacialStudentPanel(tk.Frame):
         super().__init__(parent)
         self.parent = parent
         self.controller = controller
-        # New database connection for remote MongoDB
-        # self.db = self.controller.remote
+        # self.student: StudentUserSchema = StudentUserSchema()
         
         # Configure grid sizing/constraints so camera expands
         # Title is row 0, combobox row 1, controls row 2, camera row 3
-        self.grid_rowconfigure(0, weight=0)
+        self.grid_rowconfigure(0, weight=0, pad=10)
         self.grid_rowconfigure(1, weight=0, pad=10)
         self.grid_rowconfigure(2, weight=0, pad=10)
         self.grid_rowconfigure(3, weight=1, minsize=200)
@@ -49,28 +53,13 @@ class FacialStudentPanel(tk.Frame):
         self.grid_columnconfigure(0, weight=1, uniform="maincols")
         self.grid_columnconfigure(1, weight=1, uniform="maincols")
         self.grid_columnconfigure(2, weight=0, uniform="maincols")
-        self.grid_columnconfigure(3, weight=0)
-        
-        # Ensure widgets that should fill their cells use sticky
-        # Example: let camera fill whole row and expand
-        # self.camera_frame.grid(row=3, column=0, columnspan=4, sticky="nsew", padx=5, pady=5)
-        
-        # # Make labels/buttons stretch horizontally if desired (use sticky="ew")
-        # self.class_list.grid(row=1, column=0, columnspan=2, sticky="ew", padx=5)
-        # self.input_label.grid(row=2, column=0, sticky="e", padx=5)
-        # self.name_label.grid(row=2, column=1, sticky="w", padx=5)
-        # self.record_button.grid(row=2, column=2, sticky="ew", padx=5)
-        # self.update_face_button.grid(row=2, column=3, sticky="ew", padx=5)
-        
+        self.grid_columnconfigure(3, weight=0, uniform="maincols")
+
+
         # Title label (inside this frame)
         self.title_label = ttk.Label(
-            self, text="Facial Attendance System", font=("Helvetica", 20, "bold"))
-        self.title_label.grid(row=0, column=0, columnspan=3, pady=10)
-
-        # self.sep = ttk.Separator(self, orient='horizontal')
-        # self.sep.grid(row=1, column=0, columnspan=2, sticky="ew", pady=5)
-
-        # self.configure(bg="lightblue")
+            self, text="Facial Attendance System", font=("Helvetica", 20, "bold"), bootstyle=DEFAULT)
+        self.title_label.grid(row=0, column=1, columnspan=2, pady=10, padx=10)
         
         # Initialize facial controller (may be stateful)
         try:
@@ -97,37 +86,52 @@ class FacialStudentPanel(tk.Frame):
             print(f"An error occurred loading classes: {e}")
             classes_list = []
 
+        # Actions frame for class selection and buttons
+        self.actions = ttbk.Frame(self, padding=10, bootstyle=(SECONDARY))
+        self.actions.grid(row=0, rowspan=4, column=3, ipadx=5, sticky="ns")
+
         # Extract class names shows as "course_code : name"
         class_names = [
             f"{cls['course_code']} : {cls['name']}" for cls in classes_list]
         # Class selection combobox
-        self.class_list = ttk.Combobox(self)
+        self.class_list = ttk.Combobox(self.actions)
         self.class_list['values'] = class_names
         self.class_list.set("Select Class")
         self.class_list.bind("<<ComboboxSelected>>", on_select)
-        self.class_list.grid(row=1, column=0,ipadx=5, sticky="w")
-
-        # # Camera feed frame (Label used to hold image)
-        # self.camera_frame = Label(self, width=self.parent.winfo_width()//2, height=(self.parent.winfo_height()//4))
-        # self.camera_frame.pack(pady=10, expand=False, fill="both")
-
-
-        # Input field for student name
-        self.input_label = ttk.Label(
-            self, text="Current Student Name:", font=("Helvetica", 14))
-        self.input_label.grid(row=2, column=0, ipadx=5, sticky="w")
-
-        self.name_label = ttk.Label(
-            self, text="student name", font=("Helvetica", 14))
-        self.name_label.grid(row=2, column=0, ipadx=5, sticky="e")
+        # self.class_list.grid(row=0, column=0,ipadx=5,pady=10, padx=2, sticky="ne")
         
         # Record attendance button
-        self.record_button = ttk.Button(self, text="Record Attendance", command=self.record_attendance)
-        self.record_button.grid(row=1, column=1, ipadx=5, sticky="e")
-        # Update Student Face Data Button
-        self.update_face_button = ttk.Button(self, text="Update Face Data", command=self.update_face_data)
-        self.update_face_button.grid(row=1, column=2, ipadx=5, sticky="w")
+        self.record_button = ttbk.Button(self.actions, text="Record Attendance", command=self.record_attendance, bootstyle=SUCCESS)
+        # self.record_button.grid(row=1, column=0, ipadx=5, padx=2, pady=10)
+
         
+        # Update Student Face Data Button
+        self.update_face_button = ttbk.Button(self.actions, text="Update Face Data", command=self.update_face_data, bootstyle=PRIMARY)
+        # self.update_face_button.grid(row=2, column=0, pady=10, padx=2)
+
+
+        self.class_list.pack(pady=10, expand=False, fill="x")
+        ttbk.Separator(self.actions, orient='horizontal', bootstyle=PRIMARY).pack(fill="x", pady=10)
+        self.update_face_button.pack(pady=20, expand=True, fill="both")
+        ttbk.Separator(self.actions, orient='horizontal', bootstyle=PRIMARY).pack(fill="x", pady=10)
+        self.record_button.pack(pady=20, expand=True, fill="both")
+
+        
+        # LABELFRAME STUDENT INFO
+        self.name_frame = ttbk.Labelframe(self, text="Logged In As:", bootstyle=INFO)
+        self.name_frame.grid(row=0, column=0, rowspan=2, columnspan=1, ipadx=5, sticky="nsew", padx=10, pady=10)
+
+        # Input field for student name
+        self.email_label = ttbk.Label(
+            self.name_frame, text="Name:", font=("Helvetica", 14), bootstyle=(SECONDARY, INVERSE))
+        self.email_label.grid(row=1, column=0, ipadx=1, sticky="ew")
+
+        # self.sep = ttbk.Separator(self.name_frame, orient='horizontal', bootstyle=INFO)
+        # self.sep.grid(row=0, column=1, ipadx=5, sticky="ew")
+        
+        self.name_label = ttbk.Label(
+            self.name_frame, text="student name", font=("Helvetica", 14), bootstyle=(SECONDARY, INVERSE))
+        self.name_label.grid(row=0, column=0, ipadx=1, sticky="ew")
         
         # Camera feed frame (Label used to hold image)
         self.camera_frame = ttk.Label(self)
@@ -156,6 +160,7 @@ class FacialStudentPanel(tk.Frame):
             self.student = self.controller.load_student()
             print("FacialStudentPanel on_show loaded student: ", self.student)
             self.name_label.config(text=f"{self.student['name']}")
+            self.email_label.config(text=f"{self.student['email']}")
         except Exception as e:
             print("Error in on_show:", e)
 
@@ -163,9 +168,15 @@ class FacialStudentPanel(tk.Frame):
             self.confirm_button = tk.Button(self, text="Confirm Attendance", font=(
                 "Helvetica", 14), command=self.test_confirm_attendance)
             self.confirm_button.grid(row=4, column=2,pady=10)
+        else:
+            try:
+                self.confirm_button.grid_forget()
+            except Exception:
+                print("No confirm button to remove.")
 
     # -- Test Confirm Attendance --
     def test_confirm_attendance(self):
+        """Test confirming attendance with a predefined student and class."""
         self.confirm_attendance(
             student_name=self.student['name'], class_name=self.class_list.get(), face_path="./database/tests/MuskComp.jpg")
         print("Test confirm attendance executed.")
@@ -306,14 +317,14 @@ class FacialStudentPanel(tk.Frame):
             message = "An error occurred. Please try again."
 
         # Show confirmation message in a new window
-        self.confirm_window = tk.Toplevel(self.parent)
+        self.confirm_window = ttbk.Toplevel(self.parent)
         self.confirm_window.title("Attendance Confirmation")
         self.confirm_window.geometry("400x200")
-        self.confirmation_label = Label(
+        self.confirmation_label = ttbk.Label(
             self.confirm_window, text=message, font=("Helvetica", 12), wraplength=350, justify="center"
         )
         self.confirmation_label.pack(pady=20)
-        close_button = Button(self.confirm_window, text="Close",
+        close_button = ttbk.Button(self.confirm_window, text="Close",
                             command=self.confirm_window.destroy)
         close_button.pack(pady=10)
 

@@ -1,6 +1,10 @@
 import os
 from time import time
 import tkinter as tk
+# from tkinter import ttk
+
+import ttkbootstrap as ttk
+from ttkbootstrap.constants import *
 
 from build.lib.src.models.User import StudentUserSchema
 
@@ -8,8 +12,8 @@ from build.lib.src.models.User import StudentUserSchema
     # 1. Need to get and show all classes
     # 2. Need to get and show all students
     # 3. Need to implement adding/removing students and classes
-
-class AdminPanel(tk.Frame):
+    # 4. Implement TTK Theming and fix features
+class AdminPanel(ttk.Frame):
     def __init__(self, parent, controller) -> None:
         super().__init__(parent)
         self.controller = controller
@@ -17,28 +21,37 @@ class AdminPanel(tk.Frame):
 
     def build_ui(self) -> None:
         """Create widgets once when the panel is shown."""
-        self.configure(background="grey")
+        self.rowconfigure(0, weight=1, uniform="mainrows", pad=20)
+        self.rowconfigure(1, weight=1, uniform="mainrows", pad=20)
+        self.rowconfigure(2, weight=1, uniform="mainrows", pad=20)
+        self.rowconfigure(3, weight=1, uniform="mainrows", pad=20)
+        self.rowconfigure(4, weight=1, uniform="mainrows", pad=20)
+        self.columnconfigure(0, weight=1, uniform="maincols", pad=20)
+        self.columnconfigure(1, weight=1, uniform="maincols", pad=20)
+        self.columnconfigure(2, weight=1, uniform="maincols")
         
-        title = tk.Label(self, text="Admin Panel",
-                         bg="grey", font=("Arial", 18))
-        title.pack(pady=20)
-        tk.Button(self, text="Manage Users", command=self.manage_users,
-                  width=50, height=2, font=("Arial", 14)).pack(pady=10)
-        tk.Button(self, text="View Reports", command=self.view_reports,
-                  width=50, height=2, font=("Arial", 14)).pack(pady=10)
+        title = ttk.Label(self, text="Admin Panel", font= ("Arial", 18, "bold", "underline"))
+        title.grid(row=0, column=0, columnspan=3, ipady=10)
+
         
-        tk.Button(self,background="green", text="Add New Student", command=self.add_new_student, width=50, height=2, font=("Arial", 14)).pack(pady=10)
+        ttk.Button(self, text="Manage Users", command=self.manage_users,
+            ).grid(row=1, column=0, ipady=10, ipadx=10)
+        ttk.Button(self, text="View Reports", command=self.view_reports,
+            ).grid(row=1, column=1, ipady=10, ipadx=10)
+        
+        ttk.Button(self, text="Add New Student", command=self.add_new_student).grid(row=1, column=2, ipady=10, ipadx=10)
+        
         
         self.built = True
 
 
 
         # Display List of Classes in raw format
-        classes_list = tk.Text(self, height=100, width=100,
+        classes_list = tk.Text(self,
                 bg="grey", font=("Arial", 12), fg="white")
         for clss in self.controller.all_classes:
             classes_list.insert(tk.END, f"_id: {clss['_id']} : [{clss['course_code']} : {clss['name']}, Start time: {clss['start_time'].time()} : End time {clss['end_time'].time()}]\n")
-        classes_list.pack(fill="both", pady=20, expand=True)
+        classes_list.grid(row=3, column=0, columnspan=3, rowspan=2, sticky="nsew", padx=10, pady=10)
 
 
     def on_show(self) -> None:
@@ -54,11 +67,11 @@ class AdminPanel(tk.Frame):
         win = tk.Toplevel(self)
         win.title("Add New Student")
         win.geometry("300x200")
-        tk.Label(win, text="Student Name:").pack(pady=10)
-        name_entry = tk.Entry(win)
+        ttk.Label(win, text="Student Name:").pack(pady=10)
+        name_entry = ttk.Entry(win, bootstyle=PRIMARY)
         name_entry.pack(pady=5)
-        tk.Label(win, text="Student Email:").pack(pady=10)
-        email_entry = tk.Entry(win)
+        ttk.Label(win, text="Student Email:").pack(pady=10)
+        email_entry = ttk.Entry(win, bootstyle=PRIMARY)
         email_entry.pack(pady=5)
         
         
@@ -70,11 +83,11 @@ class AdminPanel(tk.Frame):
                 id = new_student.save()
                 print(f"Added new student with ID: {id}")
                 win.destroy()
-        tk.Button(win, text="Submit", command=submit).pack(pady=20)
+        ttk.Button(win, text="Submit", command=submit).pack(pady=20)
     
     def manage_users(self) -> None:
         users = self.controller.all_students
-        win = tk.Toplevel(self)
+        win = ttk.Toplevel(self)
         win.title("Manage Users")
         win.geometry("300x300")
         user_list = tk.Listbox(win)
@@ -98,17 +111,7 @@ class AdminPanel(tk.Frame):
 
 
 def main() -> None:
-    root = tk.Tk()
-    root.title("Admin Panel")
-    root.geometry("600x400")
-    
-    app = AdminPanel(root)
-    app.on_show()
-    app.pack(fill="both", expand=True)
-    
-    root.protocol("WM_DELETE_WINDOW", app.close)
-    root.mainloop()
-
+    pass
 
 if __name__ == '__main__':
     main()

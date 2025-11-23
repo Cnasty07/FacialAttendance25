@@ -38,7 +38,6 @@ def deactivate() -> None:
 
 # Entry Point For Application
 def main() -> None:
-    
     sys.path.append(os.getcwd()) # Ensure current working directory is in sys.path for module resolution.
     print("Current working directory: ", sys.path[0])
     

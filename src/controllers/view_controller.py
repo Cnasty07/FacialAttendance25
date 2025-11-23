@@ -1,13 +1,13 @@
+from ensurepip import bootstrap
 import tkinter as tk
-import tkinter.ttk as ttk
+# import tkinter.ttk as ttk
+import ttkbootstrap as ttk
 from src import ui
 
 # Testing Adding Variables to Frames and Passing Data Between Frames
 from src.models.User import AdminUserModel , StudentUserSchema
 from src.models.Classes import ClassesSchema
-from typing import Any
 
-from src.controllers.facialController import FacialController
 from src.controllers.remoteDatabaseController import remoteController
 
 # Controller that is the parent/root of the tkinter GUI. Methods to switch frames and fetch data from remote controller.
@@ -15,7 +15,7 @@ from src.controllers.remoteDatabaseController import remoteController
 # TODO: New Frame Switching Mechanism with lazy-loading and on_show hooks. Needs Testing For Functionality.
 
 # -- Application Controller for Frame Management --
-class AppController(tk.Tk):
+class AppController(ttk.Tk):
     def __init__(self, remoteClient: remoteController) -> None:
         super().__init__()
         # Initialize Local Scripts & Models
@@ -33,28 +33,29 @@ class AppController(tk.Tk):
         self.sheight = int(self.winfo_screenheight()/2 - 300)
         print("Screen Width:", self.swidth, "Screen Height:", self.sheight)
         self.geometry(f"800x600+{self.swidth}+{self.sheight}")
-        # self.minsize(800, 600)
-        # self.maxsize(800, 600)
+
         ## Menu to switch user types
-        self.menubar = tk.Menu(self)
+        self.menubar = ttk.Menu(self)
         self.config(menu=self.menubar)
         
-        switch_menu = tk.Menu(self.menubar, tearoff=0)
-        switch_menu.add_command(label="Switch User Type", command=self.switch_user)
-        self.menubar.add_cascade(label="View", menu=switch_menu)
+        view_menu = ttk.Menu(self.menubar, tearoff=0)
+        view_menu.add_command(label="Switch User Type", command=self.switch_user)
+        view_menu.add_separator()
+        view_menu.add_command(label="Test User", command=self.test_user)
+        self.menubar.add_cascade(label="Switch", menu=view_menu)
+
+        theme_menu = ttk.Menu(self.menubar, tearoff=0)
+        theme_menu.add_command(label="Toggle Theme", command=self.set_theme)
+        self.menubar.add_cascade(label="Theme", menu=theme_menu)
         
         # Set ttk theme
-        self.style = ttk.Style(self)
+        self.style = ttk.Style("darkly")
         print(self.style.theme_names())
-        self.style.theme_use("aqua")
-        
-        # self.grid_rowconfigure(0, weight=1)
-        # self.grid_columnconfigure(0, weight=1)
 
         # Container for all frames
-        container = tk.Frame(self)
-        container.pack(fill="both", expand=True)
-        container.grid(row=0, column=0, sticky="nsew")
+        container = ttk.Frame(self, style="TFrame")
+        container.place(relx=0, rely=0, relwidth=1, relheight=1) # needed to fill entire window
+        # container.grid(row=0, column=0, sticky="nsew")
         container.grid_rowconfigure(0, weight=1)
         container.grid_columnconfigure(0, weight=1)
         
@@ -72,10 +73,26 @@ class AppController(tk.Tk):
         # optionally show initial frame
         self.show_frame("ChooseUserPanel")
         
-        
+
+    def set_theme(self) -> None:
+        """Set the ttkbootstrap theme for the application."""
+        try:
+            if self.style.theme_use() == "darkly":
+                self.style.theme_use("pulse")
+            else:
+                self.style.theme_use("darkly")
+        except Exception as e:
+            print(f"Error Switching Theme: {e}")
+
     def switch_user(self) -> None:
         """Switch back to the Choose User Panel."""
         self.show_frame("ChooseUserPanel")
+
+    def test_user(self) -> None:
+        """Switch to Facial Student Panel with test user."""
+        self.student = self.get_single_student("em@tamusa.edu")
+        
+        self.show_frame("FacialStudentPanel")
 
     ## --- Student Related Methods --- ##
     def get_single_student(self, student_email: str) -> StudentUserSchema | None:
@@ -127,9 +144,11 @@ class AppController(tk.Tk):
 
         # example: automatically refresh classes when showing the AdminPanel
         if cont == "AdminPanel":
+            self.frames["AdminPanel"].refresh()
             print("Switched to AdminPanel.")
 
         if cont == "FacialStudentPanel":
+            self.frames["FacialStudentPanel"].on_show()
             print("Switched to FacialStudentPanel.")
 
 # -- END Application Controller for Frame Management --
