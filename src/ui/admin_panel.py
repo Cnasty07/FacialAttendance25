@@ -1,8 +1,7 @@
 import os
 from time import time
-import tkinter as tk
-# from tkinter import ttk
 
+import tkinter as tk
 import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
 
@@ -26,7 +25,7 @@ class AdminPanel(ttk.Frame):
         self.rowconfigure(2, weight=1, uniform="mainrows", pad=20)
         self.rowconfigure(3, weight=1, uniform="mainrows", pad=20)
         self.rowconfigure(4, weight=1, uniform="mainrows", pad=20)
-        self.columnconfigure(0, weight=1, uniform="maincols", pad=20)
+        self.columnconfigure(0, weight=1, uniform="maincols", pad=10)
         self.columnconfigure(1, weight=1, uniform="maincols", pad=20)
         self.columnconfigure(2, weight=1, uniform="maincols")
         
@@ -41,18 +40,32 @@ class AdminPanel(ttk.Frame):
         
         ttk.Button(self, text="Add New Student", command=self.add_new_student).grid(row=1, column=2, ipady=10, ipadx=10)
         
+
+
+        self.notebook = ttk.Notebook(self)
+        self.notebook.grid(row=2, column=0, columnspan=3, rowspan=2, sticky="nsew", padx=10, pady=10)
+
+        # create tabs
+        self.classes_tab = ttk.Frame(self.notebook)
+        self.students_tab = ttk.Frame(self.notebook)
+
+        self.notebook.add(self.classes_tab, text="Classes")
+        self.notebook.add(self.students_tab, text="Students")
+
+        self.classes_tab.rowconfigure(0, weight=1)
+        self.classes_tab.columnconfigure(0, weight=1)
+        self.students_tab.rowconfigure(0, weight=1)
+        self.students_tab.columnconfigure(0, weight=1)
+
+        self.classes_listbox = tk.Listbox(self.classes_tab)
+        self.classes_listbox.grid(row=0, column=0, sticky="nsew", padx=10, pady=10)
+        self.classes_listbox.insert(tk.END, *[f"{clss['course_code']} : {clss['name']}" for clss in self.controller.all_classes])
+        
+        self.students_listbox = tk.Listbox(self.students_tab)
+        self.students_listbox.grid(row=0, column=0, sticky="nsew", padx=10, pady=10)
+        self.students_listbox.insert(tk.END, *[f"{student['name']} : {student['email']}" for student in self.controller.all_students])
         
         self.built = True
-
-
-
-        # Display List of Classes in raw format
-        classes_list = tk.Text(self,
-                bg="grey", font=("Arial", 12), fg="white")
-        for clss in self.controller.all_classes:
-            classes_list.insert(tk.END, f"_id: {clss['_id']} : [{clss['course_code']} : {clss['name']}, Start time: {clss['start_time'].time()} : End time {clss['end_time'].time()}]\n")
-        classes_list.grid(row=3, column=0, columnspan=3, rowspan=2, sticky="nsew", padx=10, pady=10)
-
 
     def on_show(self) -> None:
         """Called by the controller when this frame is shown."""
@@ -64,9 +77,13 @@ class AdminPanel(ttk.Frame):
 
     def add_new_student(self) -> None:
         # Implement adding a new student (open new window or modal dialog)
-        win = tk.Toplevel(self)
+        win = ttk.Toplevel(self.controller)
+        win.transient(self.controller)
+        win.grab_set()
+        x = self.winfo_rootx() + self.winfo_width() // 2
+        y = self.winfo_rooty() + self.winfo_height() // 2
         win.title("Add New Student")
-        win.geometry("300x200")
+        win.geometry(f"300x200-{x}+{y}")
         ttk.Label(win, text="Student Name:").pack(pady=10)
         name_entry = ttk.Entry(win, bootstyle=PRIMARY)
         name_entry.pack(pady=5)
@@ -94,6 +111,8 @@ class AdminPanel(ttk.Frame):
         for user in users:
             user_list.insert(tk.END, user['name'])
         user_list.pack(fill="both", expand=True, padx=10, pady=10)
+
+        user_list.bind("<<ListboxSelect>>", lambda event: print("Selected user:", user_list.get(user_list.curselection())))
 
     def view_reports(self) -> None:
         # Implement report viewing (open new window or populate this frame)

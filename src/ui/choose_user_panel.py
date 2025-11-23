@@ -1,5 +1,4 @@
 import tkinter as tk
-# from tkinter import ttk
 import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
 # INFO: This panel allows the user to choose between Admin and User modes. Rather than doing it from the CLI.
@@ -23,17 +22,57 @@ class ChooseUserPanel(ttk.Frame):
 
     def build_ui(self) -> None:
         """Create widgets once when the panel is shown."""
-        title = ttk.Label(self, text="Choose User Type Panel", font=("Arial", 18, "bold", "underline"))
-        title.grid(row=0, columnspan=2)
-        self.style = ttk.Style()
-        self.style.configure("primary.TButton",font=("Helvetica", 16, "bold"))
-        self.style.configure("success.TButton",font=("Helvetica", 16, "bold"))
-        self.admin_button = ttk.Button(self, text="Admin", command=self.admin_selected, bootstyle=PRIMARY)
-        self.admin_button.grid(row=1, column=0, ipady=10, ipadx=10, sticky="nsew")
+    
+        # --- Title ---
+        title = ttk.Label(self, text="Who Are You?", font=("Arial", 28, "bold"), bootstyle="inverse-light")
+        # Increase the font size for emphasis
+        title.grid(row=0, columnspan=2, pady=30) # Add vertical padding
 
-        self.user_button = ttk.Button(self, text="Student", command=self.user_selected, bootstyle=SUCCESS)
-        self.user_button.grid(row=1, column=1, ipady=10, ipadx=10, sticky="nsew")
+        # --- Style Configuration (using a custom outline style for better visual) ---
+        self.style = ttk.Style()
+        # Configure the standard TButton styles for larger font
+        self.style.configure("TButton", font=("Helvetica", 18, "bold")) 
+        
+        # Optional: Configure a style that looks more like a filled panel (less border)
+        self.style.configure("Admin.TButton", background="#213a5a", foreground="white", focuscolor=self.style.lookup("primary.TButton", "focuscolor"))
+
+        self.style.configure("Student.TButton", background="#00a373", foreground="white", focuscolor=self.style.lookup("success.TButton", "focuscolor"))
+        
+        # --- Buttons (Full Panel) ---
+        self.admin_button = ttk.Button(self, text="Admin", command=self.admin_selected, bootstyle=PRIMARY) # Using standard bootstyle
+        
+        # The sticky="nsew" combined with grid_columnconfigure/grid_rowconfigure (weight=1) 
+        # makes the button fill the entire cell in row 1, column 0.
+        self.admin_button.grid(row=1, column=0, sticky="nsew") 
+
+        self.user_button = ttk.Button(self, text="Student", command=self.user_selected, bootstyle=SUCCESS) # Using standard bootstyle
+        
+        self.user_button.grid(row=1, column=1, sticky="nsew")
+    
+        # --- Add Hover Effect ---
+        self.setup_hover_effects() # Call the new method
+    
         self.built = True
+    def setup_hover_effects(self) -> None:
+        """Binds mouse events to buttons to create a hover effect."""
+        
+        # Admin Button Hover
+        self.admin_button.bind("<Enter>", lambda event: self.on_hover_enter(self.admin_button, "primary-outline"))
+        self.admin_button.bind("<Leave>", lambda event: self.on_hover_leave(self.admin_button, "primary"))
+        
+        # Student Button Hover
+        self.user_button.bind("<Enter>", lambda event: self.on_hover_enter(self.user_button, "success-outline"))
+        self.user_button.bind("<Leave>", lambda event: self.on_hover_leave(self.user_button, "success"))
+    
+    def on_hover_enter(self, widget: ttk.Button, bootstyle: str) -> None:
+        """Changes the widget's bootstyle to an outline style on mouse entry."""
+        widget.configure(bootstyle=bootstyle)
+        widget.config(cursor="hand2") # Change cursor to a hand pointer
+        
+    def on_hover_leave(self, widget: ttk.Button, bootstyle: str) -> None:
+        """Changes the widget's bootstyle back to the solid style on mouse exit."""
+        widget.configure(bootstyle=bootstyle)
+        widget.config(cursor="") # Reset cursor
 
     def on_show(self) -> None:
         """Called by the controller when this frame is shown."""
@@ -59,9 +98,11 @@ class ChooseUserPanel(ttk.Frame):
         if self.controller:
             try:
                 # Prompt for email in a modal dialog
-                win = ttk.Toplevel(self)
+                x = self.winfo_rootx() + self.winfo_width() // 2
+                y = self.winfo_rooty() + self.winfo_height() // 2
+                win = ttk.Toplevel(self.controller)
                 win.title("Enter Email")
-                win.geometry("350x160-1400+900")
+                win.geometry(f"350x160-{x}+{y}")
                 win.resizable(False, False)
                 ttk.Label(win, text="Please enter your email:", font=("Arial", 11)).pack(pady=(10, 5), padx=10)
 
@@ -113,7 +154,7 @@ class ChooseUserPanel(ttk.Frame):
                             pass
                     win.destroy()
 
-                btn_frame = ttk.Frame(win)
+                btn_frame = ttk.Frame(win, bootstyle=DEFAULT)
                 btn_frame.pack(pady=8)
                 ttk.Button(btn_frame, text="OK", width=10, command=submit_email, bootstyle=SUCCESS).pack(side="left", padx=5)
                 ttk.Button(btn_frame, text="Cancel", width=10, command=win.destroy, bootstyle=DANGER).pack(side="left", padx=5)
