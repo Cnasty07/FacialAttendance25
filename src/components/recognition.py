@@ -33,23 +33,25 @@ class FacialRecognition:
         img = face_recognition.load_image_file(img_path)
         return img
 
+    # INFO: IN USE
     @staticmethod
     def get_face_encoding(img_path: str) -> np.ndarray:
         """_summary_
             This function gets the face encoding from the image
         Returns:
-            _type_: np.ndarray
+            _type_: np.ndarray (128-dimension face encoding)
         """
+
         try:
-            img = FacialRecognition().load_image_file(img_path)
+            img = FacialRecognition.load_image_file(img_path)
         except Exception as e:
             print(f"Error loading image: {e}")
             exit()
         
-        # Returns 128-dimension face encoding for each face in the image. Currently getting only the first face found. [0]
         img_encoding = face_recognition.face_encodings(img)[0]
         return img_encoding
-    
+
+    # 
     @staticmethod
     def show_faces(self) -> None:
         """_summary_

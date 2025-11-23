@@ -1,23 +1,14 @@
 import os
-import face_recognition
-
-# staging for deletion
-# import dlib
-
 import numpy as np
-import pandas as pd
 
-# from src.controllers.databaseController import ClassTable
-
-print(os.path.dirname(os.path.relpath(__file__)))
-
+import face_recognition
 
 # -- Facial Comparison Class --
 # INFO: This class is used to compare faces to known faces in the database.
 class FacialComparison:
 
     @staticmethod
-    def compare_faces(known_faces_encodings: np.ndarray, new_img_encodings: np.ndarray = None) -> list[bool]:
+    def compare_faces(known_faces_encodings: np.ndarray, new_img_encodings: np.ndarray | None = None) -> list[bool]:
         """_summary_
         Checks database for a match of the new image. If found returns the student_id and the result of the comparison.
         If not found returns None.
@@ -26,9 +17,6 @@ class FacialComparison:
         Returns:
             dict: array of bools to see who it is in the database
         """
-        # print("known faces: ",known_faces_encodings)
-        # print(type(known_faces_encodings))
-
         # image comparison to see if the image is the same person in database
         # params : known_faces_encodings, new_img_encodings in that order
         comparison = face_recognition.compare_faces(

@@ -7,28 +7,23 @@ from datetime import datetime
 # UI packages
 import tkinter as tk
 from tkinter import ttk
-from tkinter import Label, Button, messagebox
-from tkinter import font
+from tkinter import  messagebox
+
 
 # Trying Styling
 import ttkbootstrap as ttbk
 from ttkbootstrap.constants import *
+from ttkbootstrap.dialogs import Messagebox
 
 # Image Handling
 import cv2
 from PIL import Image, ImageTk
 
 # Local Imports
-# from src.controllers.databaseController import AttendanceTable, StudentTable
 from src.controllers.facialController import FacialController
-from src.models.User import StudentUserSchema
+# from src.models.User import StudentUserSchema
 
-# from src.controllers import mongooseClient
-# TODO: Refactor and Change DB to mongo
-# 1: Refactor this into a proper Tkinter Frame for better integration with AppController
-# 2: Change database calls to MongoDB later on. (classes already done here)
-# 1. Load face_data from MongoDB instead of local SQLite
-# 2. Load attendance data from MongoDB instead of local SQLite
+
 
 # --- Facial Attendance Student View (Tkinter Frame) ---
 
@@ -58,7 +53,7 @@ class FacialStudentPanel(tk.Frame):
 
 
         # Title label
-        self.title_label = ttk.Label(
+        self.title_label = ttbk.Label(
             self, text="Facial Attendance System", font=("Helvetica", 20, "bold"), bootstyle=DEFAULT)
         # Place in row 0, spanning from column 1 to the end (before the action bar)
         self.title_label.grid(row=0, column=1, columnspan= 2, sticky="ew", pady=10, padx=10)
@@ -107,7 +102,7 @@ class FacialStudentPanel(tk.Frame):
         # self.record_button.grid(row=1, column=0, ipadx=5, padx=2, pady=10)
 
         
-        # Update Student Face Data Button
+        # Update Student Face Data Button (Not Implemented Yet)
         # self.update_face_button = ttbk.Button(self.actions, text="Update\nPortrait", command=self.update_face_data, style="primary.TButton", bootstyle=PRIMARY)
         # self.update_face_button.grid(row=2, column=0, pady=10, padx=2)
 
@@ -121,13 +116,16 @@ class FacialStudentPanel(tk.Frame):
         self.present = ttbk.Frame(self.checked_in_tab)
         self.absent = ttbk.Frame(self.not_checked_in_tab)
 
-        
+        present_people = ["No students present yet."]
+        absent_people = ["No students absent yet."]
+
         self.present_list = tk.Listbox(self.present)
-        self.present_list.insert(tk.END, "No students present yet.")
         self.present_list.pack(fill="both", expand=True, padx=5, pady=5)
+        self.present_list.insert(tk.END, *[f"* {person}" for person in present_people])
+        
         self.absent_list = tk.Listbox(self.absent)
-        self.absent_list.insert(tk.END, "No students absent yet.")
         self.absent_list.pack(fill="both", expand=True, padx=5, pady=5)
+        self.absent_list.insert(tk.END, *[f"* {person}" for person in absent_people])
 
         
 
@@ -135,7 +133,6 @@ class FacialStudentPanel(tk.Frame):
         ttbk.Separator(self.actions, orient='horizontal', bootstyle=PRIMARY).pack(fill="x", pady=10)
         self.role_call.pack(pady=10, expand=True, fill="both")
         ttbk.Separator(self.actions, orient='horizontal', bootstyle=PRIMARY).pack(fill="x", pady=10)
-        # self.update_face_button.pack(pady=20, expand=True, fill="both")
         ttbk.Separator(self.actions, orient='horizontal', bootstyle=PRIMARY).pack(fill="x", pady=10)
         self.record_button.pack(pady=20, expand=True, fill="both")
 
@@ -155,7 +152,7 @@ class FacialStudentPanel(tk.Frame):
 
 
         # Main Frame for Camera and Source Image Tabs
-        self.notebook = ttbk.Notebook(self, bootstyle=SECONDARY)
+        self.notebook = ttbk.Notebook(self, bootstyle=PRIMARY)
         self.notebook.grid(row=2, column=0, columnspan=3, rowspan=2, sticky="nsew", padx=10, pady=10)
         
 
@@ -184,16 +181,21 @@ class FacialStudentPanel(tk.Frame):
         self.update_entry_path = ttbk.Entry(self.source_tab, bootstyle=PRIMARY)
         self.update_entry_path.insert(0, "ex: .\\Database\\Tests\\<YourFaceHere>.jpg")
         self.update_entry_path.grid(row=1, column=0, columnspan=2, sticky="ew", padx=10, pady=10)
-        
+
+        # Disable record button when source tab is selected
+        self.notebook.bind("<<NotebookTabChanged>>", self.on_tab_change)
+
         # Camera
         self.cap = cv2.VideoCapture(0)
 
         # Handles no camera found error
         if self.cap is None or not self.cap.isOpened():
             self.camera_frame.grid_forget()
+            from ttkbootstrap.icons import Icon
+            error_image = ttbk.PhotoImage(data=Icon.error)
             error_label = ttbk.Label(
-                self.camera_tab, text="Error: Could not access the camera.", bootstyle=DANGER)
-            error_label.grid(row=0, column=0, sticky="nsew", ipadx=5)
+                self.camera_tab, image=error_image, text=" Error: Could not access the camera.", compound="left", bootstyle=DANGER)
+            error_label.pack(expand=True, fill="both", pady=20)
             self.running = False
         else:
             self.running = True
@@ -210,23 +212,13 @@ class FacialStudentPanel(tk.Frame):
             self.name_label.config(text=f"{self.student['name']}")
         except Exception as e:
             print("Error in on_show:", e)
-
-        if self.student['name'] == "Elon Musk":
-            self.confirm_button = tk.Button(self, text="Confirm Attendance", font=(
-                "Helvetica", 14), command=self.test_confirm_attendance)
-            self.confirm_button.grid(row=4, column=2,pady=10)
+    
+    def on_tab_change(self, event):
+        if self.source_tab.winfo_ismapped():
+            self.record_button.config(state="disabled")
         else:
-            try:
-                self.confirm_button.grid_forget()
-            except Exception:
-                print("No confirm button to remove.")
-
-    # -- Test Confirm Attendance --
-    def test_confirm_attendance(self):
-        """Test confirming attendance with a predefined student and class."""
-        self.confirm_attendance(
-            student_name=self.student['name'], class_name=self.class_list.get(), face_path="./database/tests/MuskComp.jpg")
-        print("Test confirm attendance executed.")
+            self.record_button.config(state="normal")
+        
 
     # -- Update Face Data --
     def update_face_data(self) -> None:
@@ -234,8 +226,8 @@ class FacialStudentPanel(tk.Frame):
         student_name = self.student['name']
         print(student_name)
         if not student_name:
-            messagebox.showerror(
-                "Error", "Please enter a student name to update face data.")
+            Messagebox.show_error(
+                "Error", "Please enter a student name to update face data.",parent=self.parent,alert=True)
             return
 
         ret, frame = self.cap.read()
@@ -267,8 +259,8 @@ class FacialStudentPanel(tk.Frame):
         print(f"Face captured and saved to {face_path}")
 
         # Here you would add code to update the student's face data in the database
-        messagebox.showinfo(
-            "Success", f"Face data for {student_name} has been updated.")
+        Messagebox.show_info(
+            "Success", f"Face data for {student_name} has been updated.",parent=self.parent,alert=True)
 
     def upload_from_file(self) -> None:
         """Upload face data from a file to update the student's face data."""
@@ -279,6 +271,9 @@ class FacialStudentPanel(tk.Frame):
             print("Unknown Face Encoding from file: ", unknown_face, type(unknown_face))
             self.student['face_data'].append(unknown_face.tolist())
             self.save_confirmation_remote()
+            # Here you would add code to update the student's face data in the database
+            Messagebox.show_info(
+                "Success", f"Face data for {self.student['name']} has been updated.",parent=self.parent,alert=True)
         except Exception as e:
             print("Error processing image from file:", e)
             return
@@ -361,18 +356,7 @@ class FacialStudentPanel(tk.Frame):
                 # Printing message for confirmation on student attendance
                 if self.controller.remote.Student.find_one(student_id):
                     print("Attendance recorded for existing student.")
-                    message = (f"{student_name} successfully recorded for attendance " +
-                               f"on {formatted_time} for class {class_name}.")
-                # if self.controller.remote.Student.find_one({"email": self.student['email']}):
-                #     print("Attendance recorded for existing student.")
-                #     message = (f"{student_name} successfully recorded for attendance " +
-                #                f"on {formatted_time} for class {class_name}.")
-                else:
-                    # Delete when done. Will not be used once DB is set up properly.
-                    new_student = self.student
-                    print("New student created:", new_student)
-                    message = (f"New student {student_name} added and attendance recorded " +
-                               f"on {formatted_time} for class {class_name}.")
+                    message = (f"{student_name} successfully recorded for attendance on {formatted_time} for class {class_name}.")
             else:
                 message = "No match found. Attendance not recorded."
         except Exception as e:
@@ -383,9 +367,12 @@ class FacialStudentPanel(tk.Frame):
         self.confirm_window = ttbk.Toplevel(self.parent)
         self.confirm_window.title("Attendance Confirmation")
         self.confirm_window.geometry("400x200")
+        self.confirm_window.transient(self.parent)
+        self.confirm_window.grab_set()
         self.confirmation_label = ttbk.Label(
             self.confirm_window, text=message, font=("Helvetica", 12), wraplength=350, justify="center"
         )
+        
         self.confirmation_label.pack(pady=20)
         close_button = ttbk.Button(self.confirm_window, text="Close",
                             command=self.confirm_window.destroy)
@@ -463,10 +450,6 @@ class FacialStudentPanel(tk.Frame):
 # -- Standalone Test Runner --
 def main() -> None:
     """Run the Facial Student Panel as a standalone application for testing."""
-    # parent = tk.Tk()
-    # app = FacialStudentPanel(parent)
-    # parent.protocol("WM_DELETE_WINDOW", app.close)
-    # parent.mainloop()
 
 
 if __name__ == "__main__":

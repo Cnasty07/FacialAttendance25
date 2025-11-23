@@ -11,9 +11,10 @@ from pymongoose.mongo_types import Types, Schema
 PyObjectId = Annotated[str, BeforeValidator(str)]
 
 # INFO: Classes Model Class
-    ## This is the Classes Model that will be used to represent class/course data.
-    ## FIXME: Removed roster for now to simplify the model.
 
+# FIXME: Removed roster for now to simplify the model.
+
+# -- CLASSES MODEL --
 class ClassesModel(BaseModel):
     id: Optional[PyObjectId] = Field(alias="_id", default=None)
     name: StrictStr = Field(description="Name of the class/course", min_length=1)

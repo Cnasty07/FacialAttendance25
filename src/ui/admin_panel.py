@@ -1,17 +1,17 @@
 import os
 from time import time
 
+# Styling and UI
 import tkinter as tk
 import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
 
+# Local Imports
 from build.lib.src.models.User import StudentUserSchema
 
 # TODO: Implement Admin Panel functionality
-    # 1. Need to get and show all classes
-    # 2. Need to get and show all students
-    # 3. Need to implement adding/removing students and classes
-    # 4. Implement TTK Theming and fix features
+    # 1. Need to implement adding/removing students and classes
+    
 class AdminPanel(ttk.Frame):
     def __init__(self, parent, controller) -> None:
         super().__init__(parent)

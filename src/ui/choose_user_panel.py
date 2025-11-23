@@ -1,6 +1,8 @@
+# Styling and UI
 import tkinter as tk
 import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
+
 # INFO: This panel allows the user to choose between Admin and User modes. Rather than doing it from the CLI.
 ## It will then call the controller to switch frames accordingly.
 

@@ -7,9 +7,9 @@ from typing import Annotated , Optional
 
 PyObjectId = Annotated[str, BeforeValidator(str)]
 
-# TODO: Implement this when everything else is done.
-    # Not in use yet.
+# INFO: NOT IN USE YET
 
+# -- ATTENDANCE MODEL --
 class AttendanceModel(BaseModel):
     id: Optional[PyObjectId] = Field(alias="_id", default=None)
     student_id: bson.ObjectId

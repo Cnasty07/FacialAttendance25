@@ -1,13 +1,12 @@
 
-from pydantic import BaseModel, Field, ConfigDict
-import numpy as np
 import bson
-
+from pydantic import BaseModel, Field, ConfigDict
 from pymongoose.mongo_types import Types, Schema
 
 # INFO: Primarily to be used when capturing and storing face into User model for Student Users.
-    # Each Face instance represents a single face encoding associated with a student and a class.
     # Not in use yet.
+
+# -- FACE MODEL --
 
 class FaceModel(BaseModel):
     student_id: bson.ObjectId = Field(description="Student's unique identifier", alias="student_id")
