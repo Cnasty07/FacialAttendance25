@@ -1,19 +1,23 @@
 import os
 import face_recognition
-import dlib
+
+# staging for deletion
+# import dlib
+
 import numpy as np
 import pandas as pd
 
-from src.controllers.databaseController import ClassTable
+# from src.controllers.databaseController import ClassTable
 
 print(os.path.dirname(os.path.relpath(__file__)))
 
-# INFO: This class is used to compare faces to known faces in the database.
 
+# -- Facial Comparison Class --
+# INFO: This class is used to compare faces to known faces in the database.
 class FacialComparison:
-    
+
     @staticmethod
-    def compare_faces(known_faces_encodings:np.ndarray,new_img_encodings: np.ndarray = None) -> dict:
+    def compare_faces(known_faces_encodings: np.ndarray, new_img_encodings: np.ndarray = None) -> list[bool]:
         """_summary_
         Checks database for a match of the new image. If found returns the student_id and the result of the comparison.
         If not found returns None.
@@ -24,29 +28,40 @@ class FacialComparison:
         """
         # print("known faces: ",known_faces_encodings)
         # print(type(known_faces_encodings))
-        
+
         # image comparison to see if the image is the same person in database
         # params : known_faces_encodings, new_img_encodings in that order
-        comparison = face_recognition.compare_faces(known_faces_encodings, new_img_encodings)
-                
+        comparison = face_recognition.compare_faces(
+            known_faces_encodings, new_img_encodings)
+
         return comparison
-    
+
     @staticmethod
-    def comparison_accuracy(student_facial_imgs = None,new_img: np.ndarray = None) -> np.linalg.norm :
+    def comparison_accuracy(student_facial_imgs=None, new_img: np.ndarray | None= None) -> np.ndarray:
+        """_summary_
+            Calculates the accuracy of the facial recognition comparison.
+        Args:
+            student_facial_imgs (_type_, optional): _description_. Defaults to None.
+            new_img (np.ndarray, optional): _description_. Defaults to None.
+
+        Returns:
+            np.linalg.norm: _description_
+        """
         # accuracy of prediction
-        face_distance = face_recognition.face_distance([student_facial_imgs], new_img)
+        face_distance = face_recognition.face_distance(
+            [student_facial_imgs], new_img)
         return face_distance
 
+# -- END Facial Comparison Class --
 
+
+# Testing Purposes
 def main() -> None:
-    os.add_dll_directory(os.environ['CUDA_PATH'])
-    dlib.DLIB_USE_CUDA = True
-    if dlib.DLIB_USE_CUDA:
-        print("Using CUDA for dlib.")
-    else:
-        print("CUDA is not available for dlib.")
-    new_comparison = FacialComparison()
-    new_comparison.compare_faces()
+    from utils.gpu_detection import is_gpu_available
+    is_gpu_available()
+    # new_comparison = FacialComparison()
+    # new_comparison.compare_faces()
+
 
 if __name__ == '__main__':
     main()

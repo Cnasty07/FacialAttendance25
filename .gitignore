@@ -5,3 +5,6 @@ __pycache__/
 **/__pycache__/
 build/**
 /FacialAttendance.egg-info
+/database/new_db_folder/*.py
+/src/controllers/remoteDB/
+/src/controllers/remoteDatabaseController.py

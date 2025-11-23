@@ -5,11 +5,19 @@ name = "pypi"
 
 [packages]
 facialattendance = {file = "."}
-opencv-python = "*"
 dlib = "*"
 pytest = "*"
 cmake = "*"
 face-recognition = "*"
+pydantic = "*"
+face-recognition-models = {git = "https://github.com/ageitgey/face_recognition_models"}
+setuptools = "*"
+opencv-python = "*"
+pymongo = {extras = ["srv"], version = "*"}
+pandas = "*"
+pyarrow = "*"
+pymongoose = "*"
+ttkbootstrap = "*"
 
 [dev-packages]
 

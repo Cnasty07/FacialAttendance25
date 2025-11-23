@@ -18,6 +18,10 @@ setup(
         'pandas', 
         'scikit-learn',
         'Pillow',
+        'setuptools',
+        'pydantic',
+        'pymongo[srv]',
+        'pymongoose',
     ],
     entry_points={
         'console_scripts': [
@@ -27,7 +31,7 @@ setup(
     author='Chris Nastasi & Ruben Reyes',
     author_email='cnast01@jaguar.tamu.edu',
     description='A facial recognition based attendance system',
-    url='https://github.com/Cnasty07/FacialAttendance',
+    url='https://github.com/Cnasty07/FacialAttendance25',
     classifiers=[
         'Programming Language :: Python :: 3',
         'License :: OSI Approved :: MIT License',

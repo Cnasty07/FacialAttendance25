@@ -1,55 +1,49 @@
 import os 
 import sys
-import cv2
-import face_recognition
-import dlib
-import tkinter as tk
 
-from src import ui
+from utils import gpu_detection
+from src.controllers.view_controller import AppController
+from src.controllers.remoteDatabaseController import remoteController
 
 
-### TODO: Finish Entry to application
+# TODO: Finish Entry to application
+
+# TODO: Test New Tkinter Frame Switching Mechanism, Add Switch User Button.
 
 
-def activate(root):
+# -- Application Activation Function --
+def activate(app) -> None:
     """_summary_
     starts the facial recognition system.
     """
-    # adds the CUDA path to the system path and sets dlib to use CUDA
-    try:
-        os.add_dll_directory(os.environ['CUDA_PATH'])
-        dlib.DLIB_USE_CUDA = True
-        print("Cuda detected. Using GPU acceleration.")
-    except Exception as e:
-        print("Cuda not detected. Defaulting to cpu.", e)
+    gpu_detection.is_gpu_available() # Check for GPU availability
 
-    # Starts the interface: CLI input required at the moment to choose admin or user
-    user_type = input("Enter user type (admin/user): ").strip().lower()
-
-    # Option 1: Admin Panel
-    if user_type == "admin":
-        admin_panel = ui.admin_panel.AdminPanel(root)
-        root.protocol("WM_DELETE_WINDOW", admin_panel.close)
-        root.mainloop()
-        
-    # Option 2: User Facial Attendance Panel
-    elif user_type == "user":
-        check_in = ui.new_interface.FacialAttendanceSystemApp(root)
-        root.protocol("WM_DELETE_WINDOW", check_in.close)
-        root.mainloop()
-    else:
-        print("Invalid user type. Exiting.")
-        return None
+    ## -- Setup Main Application Window --
+    app.geometry("800x600")
+    app.title("Facial Attendance System")
+    app.show_frame("ChooseUserPanel")
+    app.protocol("WM_DELETE_WINDOW", app.destroy)
+    
+    ## Start GUI loop
+    app.mainloop()
+    ## -- END Setup Main Application Window --
+    
+# -- END Application Activation Function --
 
 
-def deactivate():
-    exit()
+# Terminates the application (will probably delete later as it serves limited use now).
+def deactivate() -> None:
+    sys.exit()
 
 
-def main():
-    sys.path.append(os.getcwd())
+# Entry Point For Application
+def main() -> None:
+    sys.path.append(os.getcwd()) # Ensure current working directory is in sys.path for module resolution.
     print("Current working directory: ", sys.path[0])
-    activate(tk.Tk())
+    
+    ## Starts the application controller for frame switching and user interface management.
+    app = AppController(remoteClient=remoteController())
+    activate(app)
 
 if __name__ == '__main__':
     main()
