@@ -21,6 +21,7 @@ from PIL import Image, ImageTk
 
 # Local Imports
 from src.controllers.facialController import FacialController
+
 # from src.models.User import StudentUserSchema
 
 
@@ -36,7 +37,6 @@ class FacialStudentPanel(tk.Frame):
         super().__init__(parent)
         self.parent = parent
         self.controller = controller
-        # self.student: StudentUserSchema = StudentUserSchema()
         
         # Configure grid sizing/constraints so camera expands
         # Title is row 0, combobox row 1, controls row 2, camera row 3
@@ -188,6 +188,7 @@ class FacialStudentPanel(tk.Frame):
         # Camera
         self.cap = cv2.VideoCapture(0)
 
+
         # Handles no camera found error
         if self.cap is None or not self.cap.isOpened():
             self.camera_frame.grid_forget()
@@ -210,14 +211,24 @@ class FacialStudentPanel(tk.Frame):
             self.student = self.controller.load_student()
             print("FacialStudentPanel on_show loaded student: ", self.student)
             self.name_label.config(text=f"{self.student['name']}")
+            # Low performance suspected due to camera. Release and reinitialize camera
+            # if self.cap is not None and self.cap.isOpened():
+            #     self.cap.release()
         except Exception as e:
             print("Error in on_show:", e)
     
     def on_tab_change(self, event):
+        
         if self.source_tab.winfo_ismapped():
             self.record_button.config(state="disabled")
+            # Stop Camera Feed
+            # self.cap.release()
+            # self.running = False
         else:
             self.record_button.config(state="normal")
+            # Restart Camera Feed
+            # self.cap = cv2.VideoCapture(0)
+            # self.running = True
         
 
     # -- Update Face Data --

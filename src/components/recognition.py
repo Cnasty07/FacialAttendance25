@@ -23,6 +23,7 @@ class FacialRecognition:
         find_face_in = face_recognition.face_locations(self.img_path)
         return find_face_in
     
+    
     @staticmethod
     def load_image_file(img_path) -> np.ndarray:
         """_summary_
@@ -51,7 +52,7 @@ class FacialRecognition:
         img_encoding = face_recognition.face_encodings(img)[0]
         return img_encoding
 
-    # 
+    # INFO : Going to use when a user uploads an image on path instead of using camera capture.
     @staticmethod
     def show_faces(self) -> None:
         """_summary_
